@@ -19,6 +19,11 @@ def homework():
 def registerPage():
     return render_template('register.html')
 
+## register 화면 보여주기
+@app.route('/readPage')
+def readPage():
+    return render_template('read.html')
+
 ## id 중복검사
 @app.route('/api/idCheck', methods=['POST'])
 def idCheck():
