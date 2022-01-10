@@ -13,7 +13,7 @@ db = client.dbhomework
 def homework():
     print("home start")
 
-    question_list = list(db.question.find({}, {'_id': False}))
+    question_list = list(db.article.find({}, {'_id': False}))
 
     return render_template('index.html', list=question_list)
 
