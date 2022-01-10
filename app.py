@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
 import jwt
-import datetime
+from datetime import datetime, timedelta
 import hashlib
 
 app = Flask(__name__)
@@ -51,19 +51,6 @@ def login():
 def search():
     words_receive = request.form['words_give']
 
-    find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}},{'_id': False}))
-
-    for i in range(len(find_list)):
-        print("find : " + str(find_list[i]))
-
-    return jsonify({'searched_list': find_list})
-
-
-## 글쓰기화면 보여주기
-@app.route('/api/search', methods=['POST'])
-def search():
-    words_receive = request.form['words_give']
-
     find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
 
     id_list = []
@@ -92,10 +79,6 @@ def read():
     return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article)
 
 
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
 ## register 화면 보여주기
 @app.route('/registerPage')
 def registerPage():
@@ -117,7 +100,7 @@ def sign_in():
     if result is not None:
         payload = {
         'id': username_receive,
-        'exp': datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
+        'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
