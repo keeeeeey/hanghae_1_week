@@ -1,13 +1,10 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-
-app = Flask(__name__)
-
-from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
 import jwt
 import datetime
 import hashlib
 
+app = Flask(__name__)
 
 # client = MongoClient('mongodb://test:test@localhost', 27017)
 
@@ -120,7 +117,7 @@ def sign_in():
     if result is not None:
         payload = {
         'id': username_receive,
-        'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
+        'exp': datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
