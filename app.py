@@ -31,11 +31,8 @@ def sign_in():
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
-    print(username_receive)
-    print(password_receive)
-
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
+    result = db.user.find_one({'username': username_receive, 'password': pw_hash})
 
     if result is not None:
         payload = {
