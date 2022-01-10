@@ -1,0 +1,7 @@
+diff a/app.py b/app.py	(rejected hunks)
+@@ -1,4 +0,4 @@
+-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
++from flask import Flask, render_template, jsonify, request
+ from pymongo import MongoClient
+ import jwt
+ import datetime

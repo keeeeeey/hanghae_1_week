@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 
 app = Flask(__name__)
 
@@ -6,7 +6,6 @@ from pymongo import MongoClient
 
 # client = MongoClient('mongodb://test:test@localhost', 27017)
 client = MongoClient('localhost', 27017)
-# client = MongoClient('localhost', 27017)
 db = client.dbhomework
 
 
