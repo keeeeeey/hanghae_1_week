@@ -31,7 +31,23 @@ def homework():
         del question_list[i]['_id']
         question_list[i]['_id'] = id_list[i]
 
-    return render_template('index.html', list=question_list)
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+
+    if token_receive is None:
+        print("비로그인 to index")
+        return render_template('index.html', list=question_list)
+    else:
+        print("로그인 to index")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.users.find_one({"id": payload['id']})['id']
+
+            return render_template('index.html', list=question_list, userId=user_id)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
 
 
 ## 글쓰기화면 보여주기

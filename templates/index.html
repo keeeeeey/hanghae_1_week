@@ -129,12 +129,12 @@
                         console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
 
                         let temp_html = `<div class="card w-100 mb-3">
-                                        <div class="card-body">
-                                            <h5 class="card-title title_ellipsis">${title}</h5>
-                                            <p class="card-text contents_ellipsis">${contents}</p>
-                                            <input type="hidden" id="article_id" value="${id}">
-                                        </div>
-                                     </div>`
+                                            <div class="card-body">
+                                                <h5 class="card-title title_ellipsis">${title}</h5>
+                                                <p class="card-text contents_ellipsis">${contents}</p>
+                                                <input type="hidden" id="article_id" value="${id}">
+                                            </div>
+                                         </div>`
 
                         $('#card_list').append(temp_html)
                     }
