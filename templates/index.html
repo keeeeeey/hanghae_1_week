@@ -38,6 +38,22 @@
 
         }
 
+        .title_ellipsis {
+            width: 100px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+
+        .contents_ellipsis {
+            width: 500px;
+            -webkit-line-clamp: 3; /* 라인수 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
     </style>
 
     <script>
@@ -47,13 +63,13 @@
             //로그인시 글쓰기 페이지 이동, 비로그인시 로그인페이지 이동
             //글쓰기 페이지 이동시, ajax를 이용하여 _id값을 갖고 이동
 
-            window.location.href="/write";
+            window.location.href = "/write";
 
         }
 
         function toLogin() {
 
-            window.location.href="/login";
+            window.location.href = "/login";
 
         }
 
@@ -74,7 +90,8 @@
 
     <div class="search_box">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username" aria-describedby="button-addon2">
+            <input type="text" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
+                   aria-describedby="button-addon2">
             <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
         </div>
     </div>
@@ -82,16 +99,16 @@
     <div class="card_list">
 
         {% if list|length %}
-        {% for item in list %}
+            {% for item in list %}
 
-        <div class="card w-100 mb-3">
-            <div class="card-body">
-                <h5 class="card-title">{{item.title}}</h5>
-                <p class="card-text">{{item.contents}}</p>
-            </div>
-        </div>
+                <div class="card w-100 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title title_ellipsis">{{ item.title }}</h5>
+                        <p class="card-text contents_ellipsis">{{ item.contents }}</p>
+                    </div>
+                </div>
 
-        {% endfor %}
+            {% endfor %}
         {% endif %}
 
     </div>
