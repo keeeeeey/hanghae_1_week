@@ -11,7 +11,11 @@ db = client.dbhomework
 ## HTML 화면 보여주기
 @app.route('/')
 def homework():
-    return render_template('index.html')
+    print("home start")
+
+    question_list = list(db.question.find({}, {'_id': False}))
+
+    return render_template('index.html', list=question_list)
 
 
 ## 글쓰기화면 보여주기
