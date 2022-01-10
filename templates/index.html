@@ -58,6 +58,40 @@
 
     <script>
 
+        function goSearch() {
+
+            var value = $('#searchWords').val();
+            console.log('value : ' + value)
+
+            $.ajax({
+                type: "POST",
+                url: "/api/search",
+                data: {words_give: value},
+                success: function (response) {
+                    console.log('success')
+                    let find_list = response['searched_list']
+                    console.log('search response : ' + find_list)
+                    $('#card_list').empty()
+                    for (let i = 0; i < find_list.length; i++) {
+                        let title = find_list[i]['title']
+                        let contents = find_list[i]['contents']
+                        console.log("in for[" + i + "] : " + title.toString() + " , " + contents.toString())
+
+
+                        let temp_html = `<div class="card w-100 mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title title_ellipsis">${title}</h5>
+                                            <p class="card-text contents_ellipsis">${contents}</p>
+                                        </div>
+                                     </div>`
+
+                        $('#card_list').append(temp_html)
+                    }
+                }
+            })
+
+        }
+
         function toWrite() {
             //로그인 상태 구분하여 분기 구현
             //로그인시 글쓰기 페이지 이동, 비로그인시 로그인페이지 이동
@@ -90,13 +124,13 @@
 
     <div class="search_box">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
+            <input id="searchWords" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
                    aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2">검색</button>
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="goSearch()">검색</button>
         </div>
     </div>
 
-    <div class="card_list">
+    <div id="card_list" class="card_list">
 
         {% if list|length %}
             {% for item in list %}
@@ -111,6 +145,13 @@
             {% endfor %}
         {% endif %}
 
+
+        <div class="card w-100 mb-3">
+            <div class="card-body">
+                <h5 class="card-title title_ellipsis">dummy</h5>
+                <p class="card-text contents_ellipsis">dummy</p>
+            </div>
+        </div>
     </div>
 
     <div class="div1">
