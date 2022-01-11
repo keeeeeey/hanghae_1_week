@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>지식 in overflow</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -29,6 +33,12 @@
 
     <style>
 
+        *{
+
+            font-family: 'Gowun Dodum', sans-serif;
+
+        }
+
         .div1 {
             display: flex;
             justify-content: flex-end;
@@ -52,6 +62,17 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .main_title{
+
+            height: 250px;
+        }
+
+        .main_text{
+
+            margin: auto;
+            padding: 100px;
         }
 
     </style>
@@ -110,7 +131,7 @@
                 alert('로그인이 필요합니다.')
                 window.location.href = "/login";
             } else {
-                window.location.href = "/write?user_id="+user_id;
+                window.location.href = "/write?user_id=" + user_id;
             }
 
         }
@@ -135,8 +156,8 @@
 <body>
 
 <div class="wrapper">
-    <div class="has-text-centered">
-        <label class="is-size-3 has-text-success">지식 in overflow</label>
+    <div class="main_title has-text-centered has-background-success">
+        <label class="main_text is-size-3 has-text-white">지식 in overflow</label>
     </div>
     <div class="div1">
         <input type="hidden" id="user_id" value="{{ userId }}">

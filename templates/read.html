@@ -152,8 +152,8 @@
             content: '';
             width: 20px; /* 사이즈 */
             height: 20px; /* 사이즈 */
-            border-top: 5px solid #000; /* 선 두께 */
-            border-right: 5px solid #000; /* 선 두께 */
+            border-top: 3px solid #000; /* 선 두께 */
+            border-right: 3px solid #000; /* 선 두께 */
             transform: rotate(315deg); /* 각도 */
         }
 
@@ -169,8 +169,8 @@
             content: '';
             width: 20px; /* 사이즈 */
             height: 20px; /* 사이즈 */
-            border-top: 5px solid #000; /* 선 두께 */
-            border-right: 5px solid #000; /* 선 두께 */
+            border-top: 3px solid #000; /* 선 두께 */
+            border-right: 3px solid #000; /* 선 두께 */
             transform: rotate(135deg); /* 각도 */
         }
 
@@ -191,6 +191,16 @@
 
             margin-top: 20px;
 
+        }
+
+        button {
+            border: none;
+            background-color: rgba(0, 0, 0, 0);
+            cursor: pointer;
+        }
+
+        .card {
+            margin: 0.3em 0;
         }
 
     </style>
@@ -235,9 +245,16 @@
                 },
                 success: function (response) {
                     if (response["result"] == "success") {
-
                         window.location.reload();
-                        //main page move
+                        console.log('after response checker : ' + checker)
+
+                        if (checker) {
+                            change_color("gray_green", "arrow_down")
+                            change_color("black", "arrow_up")
+                        } else {
+                            change_color("gray_green", "arrow_up")
+                            change_color("black", "arrow_down")
+                        }
                     }
                 }
             })
@@ -245,7 +262,7 @@
 
         function setReply() {
 
-            let article_id = $('#article_id').val();
+            let article_id = $('#article_id').val()
             let data = $('#replyData').val()
 
             $.ajax({
@@ -266,6 +283,16 @@
         function fnMove(seq) {
             var offset = $(seq).offset();
             $('html, body').animate({scrollTop: offset.top}, 400);
+        }
+
+        function change_color(val, id) {
+            var element = document.getElementById(id);
+            $('#arrow_up2').style.borderColor = "#8FB"
+            $('#arrow_up2').style.color = "#8FB"
+            $('#arrow_up2').style.borderTopColor = "#8FB"
+            $('#arrow_up2').style.borderRightColor = "#8FB"
+            if (val == "black") element.style.borderColor = "#000";
+            else if (val == "gray_green") element.style.borderColor = "#8FBC8F";
         }
 
     </script>
@@ -308,25 +335,22 @@
             {% if reply_on_article|length %}
                 {% for item in reply_on_article %}
 
-                    <div class="row" id="{{ item._id }}">
+
+                    <div class="row card">
                         <div class="col-9">
-                            <div class="card w-100 mb-3">
-                                <div class="card-body reply_body">
-                                    <h5 class="card-title">{{ item.reply_data }}</h5>
-                                </div>
+                            <div class="card-content reply-item">
+                                <p>{{ item.reply_data }}</p>
                             </div>
                         </div>
                         <div class="col">
-                            <div>
-                                <span class="arrow-up" onclick="goLike('{{ item._id }}', true)"></span>
-                            </div>
-                            <div class="like_num" id="like_num">
-                                <div class="like_value">
-                                    {{ item.good }}
-                                </div>
-                            </div>
-                            <div>
-                                <span class="arrow-down" onclick="goLike('{{ item._id }}', false)"></span>
+                            <div class="like-count">
+                                <button onclick="goLike('{{ item._id }}', true)">
+                                    <i class="far fa-thumbs-up"></i>
+                                </button>
+                                <span class="reply-count">{{ item.good }}</span>
+                                <button onclick="goLike('{{ item._id }}', false)">
+                                    <i class="far fa-thumbs-down"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
