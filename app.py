@@ -97,7 +97,6 @@ def search():
 
     return jsonify({'searched_list': find_list})
 
-
 ## 글쓰기화면 보여주기
 @app.route('/api/read')
 def read():
@@ -192,49 +191,12 @@ def write_post():
 
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
-## 글쓰기화면 보여주기
-@app.route('/login')
-def login():
-    return render_template('login.html')
 
 ## 글쓰기화면 보여주기
 @app.route('/readPage')
 def readPage():
     # article = list(db.article.find({}, {'_id': False}))
     return render_template('read.html')
-
-## 글쓰기화면 보여주기
-@app.route('/api/search', methods=['POST'])
-def search():
-    words_receive = request.form['words_give']
-
-    find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
-
-    id_list = []
-
-    # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
-    for item in find_list:
-        id_list.append(str(item['_id']))
-
-    for i in range(len(find_list)):
-        del find_list[i]['_id']
-        find_list[i]['_id'] = id_list[i]
-
-    return jsonify({'searched_list': find_list})
-
-
-## 글쓰기화면 보여주기
-@app.route('/api/read')
-def read():
-
-    article_id = request.args.get('article_id')
-    user_id = request.args.get('user_id')
-
-    target_article = db.article.find_one({'_id': article_id})
-    reply_on_article = list(db.reply.find({'article_id', article_id}))
-
-    return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article)
-
 
 ## register 화면 보여주기
 @app.route('/registerPage')
@@ -304,4 +266,4 @@ def register():
     return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=8000, debug=True)

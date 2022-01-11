@@ -15,10 +15,7 @@
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<<<<<<< HEAD
-=======
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
@@ -60,62 +57,11 @@
     </style>
 
     <script>
-
-<<<<<<< HEAD
-        function goSearch() {
-
-            var value = $('#searchWords').val();
-            console.log('value : ' + value)
-
-            $.ajax({
-                type: "POST",
-                url: "/api/search",
-                data: {words_give: value},
-                success: function (response) {
-                    console.log('success')
-                    let find_list = response['searched_list']
-                    console.log('search response : ' + find_list)
-                    $('#card_list').empty()
-                    for (let i = 0; i < find_list.length; i++) {
-                        let title = find_list[i]['title']
-                        let contents = find_list[i]['contents']
-                        console.log("in for[" + i + "] : " + title.toString() + " , " + contents.toString())
-
-                        let temp_html = `<div class="card w-100 mb-3">
-                                        <div class="card-body">
-                                            <h5 class="card-title title_ellipsis">${title}</h5>
-                                            <p class="card-text contents_ellipsis">${contents}</p>
-                                        </div>
-                                     </div>`
-
-                        $('#card_list').append(temp_html)
-                    }
-                }
-            })
-
-        }
-
-        function toRead() {
-
-            let id = $('#article_id').val();
-            let user_id = $('#user_id').val();
-
-            $.ajax({
-                type: "GET",
-                url: "/api/read",
-                data: {article_id: id, user_id: user_id},
-                success: function (response) { // 성공하면
-                    alert(response["msg"]);
-                    //read로 가기
-                }
-            })
-=======
         function toRead() {
 
             let id = $('#article_id').val();
 
             window.location.href = "/api/read?article_id=" + id;
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
 
         }
 
@@ -141,11 +87,7 @@
                         console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
 
                         let temp_html = `<div class="card w-100 mb-3">
-<<<<<<< HEAD
-                                            <div class="card-body">
-=======
                                             <div class="card-body article_body" onclick="toRead()">
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
                                                 <h5 class="card-title title_ellipsis">${title}</h5>
                                                 <p class="card-text contents_ellipsis">${contents}</p>
                                                 <input type="hidden" id="article_id" value="${id}">
@@ -163,10 +105,6 @@
             //로그인 상태 구분하여 분기 구현
             //로그인시 글쓰기 페이지 이동, 비로그인시 로그인페이지 이동
             //글쓰기 페이지 이동시, ajax를 이용하여 _id값을 갖고 이동
-<<<<<<< HEAD
-
-            window.location.href = "/write";
-=======
             var user_id = $('#user_id').val()
 
             if (user_id === "asdfew") {
@@ -175,7 +113,6 @@
             } else {
                 window.location.href = "/write?user_id="+user_id;
             }
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
 
         }
 
@@ -196,13 +133,8 @@
     <div class="has-text-centered">
         <label class="is-size-3 has-text-success">지식 in overflow</label>
     </div>
-<<<<<<< HEAD
-    <input type="hidden" id="user_id" value="{{ userId }}">
-    <div class="div1">
-=======
     <div class="div1">
         <input type="hidden" id="user_id" value="{{ userId }}">
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
         <button type="button" class="loginBtn btn btn-dark" onclick="toLogin()">로그인</button>
     </div>
 
