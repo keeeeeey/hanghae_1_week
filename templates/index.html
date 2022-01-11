@@ -107,7 +107,7 @@
                         console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
 
                         let temp_html = `<div class="card w-100 mb-3">
-                                            <div class="card-body article_body" onclick="toRead('{{ item._id }}')">
+                                            <div class="card-body article_body" onclick="toRead('${_id}')">
                                                 <h5 class="card-title title_ellipsis">${title}</h5>
                                                 <p class="card-text contents_ellipsis">${contents}</p>
                                             </div>

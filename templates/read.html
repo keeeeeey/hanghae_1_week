@@ -29,6 +29,9 @@
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <style>
         * {
             font-family: 'Jua', sans-serif;
@@ -140,47 +143,6 @@
             transform: translateY(-5px);
         }
 
-        .arrow-up {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-up::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(315deg); /* 각도 */
-        }
-
-        .arrow-down {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-down::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(135deg); /* 각도 */
-        }
-
-        .like_value {
-
-            font-size: 20px;
-            margin: auto;
-
-        }
-
         .reply {
 
             margin-top: 20px;
@@ -191,6 +153,13 @@
 
             margin-top: 20px;
 
+        }
+
+        .like-count {
+            position: absolute;
+            right: 1em;
+            bottom: 0.5em;
+            font-size: 1rem;
         }
 
         button {
@@ -206,6 +175,14 @@
     </style>
 
     <script>
+
+        $(document).ready(function(){
+
+            let temp = $({{ reply_on_article }})
+
+            console.log('start : ' + temp)
+
+        });
 
         function outArticle() {
             window.location.href = "/";
@@ -345,11 +322,13 @@
                         <div class="col">
                             <div class="like-count">
                                 <button onclick="goLike('{{ item._id }}', true)">
-                                    <i class="far fa-thumbs-up"></i>
+                                    <i id="like_filled" class="fa fa-thumbs-up"></i>
+                                    <i id="like_empty" class="far fa-thumbs-up"></i>
                                 </button>
                                 <span class="reply-count">{{ item.good }}</span>
                                 <button onclick="goLike('{{ item._id }}', false)">
-                                    <i class="far fa-thumbs-down"></i>
+                                    <i id="like_filled" class="fa fa-thumbs-down"></i>
+                                    <i id="like_empty" class="far fa-thumbs-down"></i>
                                 </button>
                             </div>
                         </div>
