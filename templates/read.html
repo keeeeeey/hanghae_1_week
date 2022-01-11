@@ -126,27 +126,56 @@
  }
     </style>
 
-     <script>
+    <script>
 
+        function outArticle() {
+             window.location.href = "/";
+        }
 
-     </script>
+        function deleteArticle() {
+            let article_id = $('#article_id').val();
+            if (confirm("정말 삭제하시겠습니까?") == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/delete",
+                    data: {articleID_give: article_id},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            alert(response["msg"])
+                            window.location.href = '/'
+                        } else {
+                            alert(response["msg"])
+                        }
+                    }
+                })
+            } else {
+                return;
+            }
+
+        }
+
+    </script>
     </head>
 <body>
     <div class = "header">
         <a href="">지식 in OverFlow</a>
-       <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>
+{#       <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>#}
     </div>
 
     <div class="body">
         <div class="wrap">
             <div class="article">
-              <span id="span_tag">질문</span><input class="ipbox_question" id="title" value="{{ target_article.title }}" readonly>
+                <span id="span_tag">질문</span><input class="ipbox_question" id="title" value="{{ target_article.title }}" readonly>
+                <input type="hidden" id="article_id" value="{{ target_article._id }}">
             </div>
             <div class="main_body">
                 <textarea class="textarea_contents" id="contents" readonly>{{ target_article.content }}</textarea>
             </div>
             <div class="buttons">
-                <button id="button" onclick="posting()">질문 수정</button>
+                {% if user_checker %}
+                    <button id="button" onclick="update()">수정하기</button>
+                    <button id="button" onclick="deleteArticle()">삭제하기</button>
+                {% endif %}
                 <button id="button" onclick="outArticle()">나가기</button>
             </div>
         </div>

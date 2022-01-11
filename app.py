@@ -37,15 +37,20 @@ def homework():
         print("비로그인 to index")
         return render_template('index.html', list=question_list)
     else:
-        print("로그인 to index")
+        print("로그인 to index" + token_receive)
         try:
+            print('try: ')
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
 
+            print('list : ' + str(question_list) + ' user_id : ' + user_id)
+
             return render_template('index.html', list=question_list, userId=user_id)
         except jwt.ExpiredSignatureError:
+            print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
+            print('case2')
             return redirect(url_for("login"))
 
 
@@ -54,23 +59,20 @@ def homework():
 def write():
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
-    user_id = request.args.get('user_id')
-    # if token_receive is None:
-    #     print("비로그인 to index")
-    #     return render_template('login.html')
-    # else:
-    # try:
-    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     user_id = db.user.find_one({"id": payload['id']})['id']
-    #
-    #     return render_template('write.html', userId=user_id)
-    # except jwt.ExpiredSignatureError:
-    #     return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    # except jwt.exceptions.DecodeError:
-    #     return redirect(url_for("login"))
-
-    return render_template('write.html', userId=user_id)
-
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to index")
+        return render_template('login.html')
+    else:
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+            print('user_id : ' + user_id)
+            return render_template('write.html', user_id=user_id)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
 
 ## 글쓰기화면 보여주기
 @app.route('/login')
@@ -105,45 +107,34 @@ def read():
 
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
-    print('article_id : ' + article_id)
-    target_article = db.article.find_one({'_id': ObjectId(article_id)})
-    # print('target_article : ' + str(target_article))
-    # reply_on_article = list(db.reply.find({'article_id', article_id}, {'_id':False}))
-    # print('reply on article : ' + str(reply_on_article))
-    user_checker = True
-    return render_template('read.html', target_article=target_article, user_checker=user_checker)
-    # if token_receive is None:
-    #     print("비로그인 to index")
-    #     return render_template('login.html')
-    # else:
-    #     print("로그인 to index")
-    #     try:
-    #         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #         user_id = db.user.find_one({"id": payload['id']})['id']
-    #
-    #         target_article = db.article.find_one({'_id': ObjectId(article_id)})
-    #         reply_on_article = list(db.reply.find({'article_id', article_id}))
-    #
-    #         user_checker = False
-    #
-    #         if target_article[user_id] == user_id:
-    #             user_checker = True
-    #         print('render_template : to read.html')
-    #         return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
-    #                                user_checker=user_checker)
-    #     except jwt.ExpiredSignatureError:
-    #         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    #     except jwt.exceptions.DecodeError:
-    #         return redirect(url_for("login"))
 
-## 글쓰기화면 보여주기
-@app.route('/write')
-def move_write():
-    token_receive = request.cookies.get('mytoken')
-    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #지정된 token id filed
-    user_info = db.article.find_one({"user_id": payload['id']})
-    return render_template('write.html', user_id = user_info["user_id"])
+    # user_checker = True
+    # return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article, user_checker=user_checker)
+    if token_receive is None:
+        print("비로그인 to read")
+        return render_template('login.html')
+    else:
+        print("로그인 to read")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+
+            target_article = db.article.find_one({'_id': ObjectId(article_id)})
+            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            print('target article : ' + str(target_article))
+            user_checker = False
+
+            if target_article['user_id'] == user_id:
+                user_checker = True
+            print('render_template : to read.html')
+            return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
+                                   user_checker=user_checker)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
+
 
 @app.route('/api/posting', methods=['POST'])
 def write_post():
@@ -173,6 +164,13 @@ def readPage():
 def registerPage():
     return render_template('register.html')
 
+## 글 삭제하기
+@app.route('/api/delete', methods=['POST'])
+def delete_article():
+    articleID_receive = request.form['articleID_give']
+    db.article.delete_one({'_id': ObjectId(articleID_receive)})
+    return jsonify({'result': 'success', 'msg': '삭제되었습니다'})
+
 ## 로그인 API
 @app.route('/api/login', methods=['POST'])
 def sign_in():
@@ -180,18 +178,15 @@ def sign_in():
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
-    print(username_receive)
-    print(password_receive)
-
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     result = db.user.find_one({'id': username_receive, 'password': pw_hash})
-    print('check login result : ' + result)
+
     if result is not None:
         payload = {
         'id': username_receive,
         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
