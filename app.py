@@ -88,6 +88,7 @@ def login():
 ## 글쓰기화면 보여주기
 @app.route('/readPage')
 def readPage():
+    # article = list(db.article.find({}, {'_id': False}))
     return render_template('read.html')
 
 ## 글쓰기화면 보여주기
