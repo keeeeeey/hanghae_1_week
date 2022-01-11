@@ -1,3 +1,5 @@
+import math
+
 from bson import ObjectId
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
@@ -19,7 +21,29 @@ SECRET_KEY = 'SPARTA'
 def homework():
     print("home start")
 
-    question_list = list(db.article.find({}))
+    # 페이지 값 (디폴트값 = 1)
+    page = request.args.get("page", 1, type=int)
+    # 한 페이지 당 몇 개의 게시물을 출력할 것인가
+    limit = 10
+
+    list_all = list(db.article.find({}))
+
+    # 게시물의 총 개수 세기
+    tot_count = len(list_all)
+    print(tot_count)
+    # 마지막 페이지의 수 구하기
+    last_page_num = math.ceil(tot_count / limit)  # 반드시 올림을 해줘야함
+
+    # 페이지 블럭을 5개씩 표기
+    block_size = 5
+    # 현재 블럭의 위치 (첫 번째 블럭이라면, block_num = 0)
+    block_num = int((page - 1) / block_size)
+    # 현재 블럭의 맨 처음 페이지 넘버 (첫 번째 블럭이라면, block_start = 1, 두 번째 블럭이라면, block_start = 6)
+    block_start = (block_size * block_num) + 1
+    # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
+    block_end = block_start + (block_size - 1)
+
+    question_list = list(db.article.find({}).skip((page - 1) * limit).limit(limit))
     id_list = []
 
     #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
@@ -35,7 +59,7 @@ def homework():
 
     if token_receive is None:
         print("비로그인 to index")
-        return render_template('index.html', list=question_list)
+        return render_template('index.html', list=question_list, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
     else:
         print("로그인 to index" + token_receive)
         try:
@@ -45,7 +69,7 @@ def homework():
 
             print('list : ' + str(question_list) + ' user_id : ' + user_id)
 
-            return render_template('index.html', list=question_list, userId=user_id)
+            return render_template('index.html', list=question_list, userId=user_id, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
             print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
