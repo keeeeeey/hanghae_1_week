@@ -249,15 +249,23 @@
             let data = $('#replyData').val()
 
             $.ajax({
-                    type: "POST",
-                    url: "/api/setReply",
-                    data: {articleID_give: article_id, reply_give: data},
-                    success: function (response) {
-                        alert(response['msg'])
-                        window.location.reload();
-                    }
-                })
+                type: "POST",
+                url: "/api/setReply",
+                data: {articleID_give: article_id, reply_give: data},
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
 
+                    fnMove(article_id)
+
+                }
+            })
+
+        }
+
+        function fnMove(seq) {
+            var offset = $(seq).offset();
+            $('html, body').animate({scrollTop: offset.top}, 400);
         }
 
     </script>
@@ -300,11 +308,11 @@
             {% if reply_on_article|length %}
                 {% for item in reply_on_article %}
 
-                    <div class="row">
+                    <div class="row" id="{{ item._id }}">
                         <div class="col-9">
                             <div class="card w-100 mb-3">
                                 <div class="card-body reply_body">
-                                    <h5 class="card-title title_ellipsis">{{ item.reply_data }}</h5>
+                                    <h5 class="card-title">{{ item.reply_data }}</h5>
                                 </div>
                             </div>
                         </div>
