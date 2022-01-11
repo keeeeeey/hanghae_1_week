@@ -1,14 +1,8 @@
-from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-
+from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
-
 import jwt
-
-from datetime import datetime, timedelta
-
+import datetime
 import hashlib
-
-# client = MongoClient('mongodb://test:test@localhost', 27017)
 
 app = Flask(__name__)
 client = MongoClient('localhost', 27017)
@@ -16,132 +10,14 @@ db = client.dbhanghae
 
 SECRET_KEY = 'SPARTA'
 
-
 ## HTML 화면 보여주기
 @app.route('/')
 def homework():
-    print("home start")
     return render_template('index.html')
 
-    question_list = list(db.article.find({}))
-    id_list = []
-
-    #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
-    for item in question_list:
-        id_list.append(str(item['_id']))
-
-    for i in range(len(question_list)):
-        del question_list[i]['_id']
-        question_list[i]['_id'] = id_list[i]
-
-    # jwt token 받아오기
-    token_receive = request.cookies.get('mytoken')
-
-    if token_receive is None:
-        print("비로그인 to index")
-        return render_template('index.html', list=question_list)
-    else:
-        print("로그인 to index")
-        try:
-            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.user.find_one({"id": payload['id']})['id']
-
-            return render_template('index.html', list=question_list, userId=user_id)
-        except jwt.ExpiredSignatureError:
-            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-        except jwt.exceptions.DecodeError:
-            return redirect(url_for("login"))
-
-
-## 글쓰기화면 보여주기
-@app.route('/write')
-def move_write():   
-    token_receive = request.cookies.get('mytoken')
-    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #지정된 token id filed
-    user_info = db.article.find_one({"user_id": payload['id']})
-    return render_template('write.html', user_id = user_info["user_id"])
-
-@app.route('/api/posting', methods=['POST'])
-def write_post():
-    id_receive = request.form['id_give']
-    title_receive = request.form['title_give']
-    content_receive = request.form['content_give']   
-
-    doc = {
-        'user_id': id_receive,
-        'title': title_receive,
-        'content': content_receive,
-    }
-
-    db.article.insert_one(doc)
-
-    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
-
-## 로그인화면 보여주기
 @app.route('/login')
 def login():
     return render_template('login.html')
-
-
-## 글쓰기화면 보여주기
-@app.route('/api/search', methods=['POST'])
-def search():
-    words_receive = request.form['words_give']
-
-    find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
-
-    id_list = []
-
-    # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
-    for item in find_list:
-        id_list.append(str(item['_id']))
-
-    for i in range(len(find_list)):
-        del find_list[i]['_id']
-        find_list[i]['_id'] = id_list[i]
-
-    return jsonify({'searched_list': find_list})
-
-
-## read화면 보여주기
-@app.route('/read')
-def read():
-    token_receive = request.cookies.get('mytoken')
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_info = db.user.find_one({"id": payload["id"]})
-        return render_template('read.html', user_info=user_info)
-    except jwt.ExpiredSignatureError:
-        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    except jwt.exceptions.DecodeError:
-        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
-
-## add reply API
-@app.route('/api/read/add_reply', methods=['POST'])
-def add_reply():
-    token_receive = request.cookies.get('mytoken')
-    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    user_nickname = db.user.find_one({"id": payload["id"]})['nickname']
-    
-    # article_id_receive = request.form['article_id_give']
-    comment_receive = request.form['comment_give']
-    doc = {
-        # "article_id": article_id_receive,
-        "mytoken": token_receive,
-        'nickname': user_nickname,
-        "comment": comment_receive,
-    }
-    db.replys.insert_one(doc)
-    return jsonify({'result': 'success'})
-
-## reply 목록 받아오기
-@app.route('/api/read/get_reply', methods=['GET'])
-def get_replys():
-    replys = list(db.replys.find({}))
-    for reply in replys:
-        reply["_id"] = str(reply["_id"])
-    return jsonify({'result': 'success', 'replys': replys})
 
 ## register 화면 보여주기
 @app.route('/registerPage')
@@ -156,14 +32,14 @@ def sign_in():
     password_receive = request.form['password_give']
 
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.user.find_one({'id': username_receive, 'password': pw_hash})
+    result = db.user.find_one({'username': username_receive, 'password': pw_hash})
 
     if result is not None:
         payload = {
         'id': username_receive,
         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -208,4 +84,4 @@ def register():
     return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=8000, debug=True)
