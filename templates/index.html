@@ -3,8 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <title>지식 in overflow</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+          integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+    <link rel="stylesheet" href="../static/css/common.css">
+
+    <style>
+
+        .div1 {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .loginBtn {
+            margin: 50px;
+
+        }
+
+        .title_ellipsis {
+            width: 100px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .contents_ellipsis {
+            width: 500px;
+            -webkit-line-clamp: 3; /* 라인수 */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    </style>
+
+    <script>
+
+        function goSearch() {
+
+            var value = $('#searchWords').val();
+            console.log('value : ' + value)
+
+            $.ajax({
+                type: "POST",
+                url: "/api/search",
+                data: {words_give: value},
+                success: function (response) {
+                    console.log('success')
+                    let find_list = response['searched_list']
+                    console.log('search response : ' + find_list)
+                    $('#card_list').empty()
+                    for (let i = 0; i < find_list.length; i++) {
+                        let title = find_list[i]['title']
+                        let contents = find_list[i]['contents']
+                        console.log("in for[" + i + "] : " + title.toString() + " , " + contents.toString())
+
+                        let temp_html = `<div class="card w-100 mb-3">
+                                        <div class="card-body">
+                                            <h5 class="card-title title_ellipsis">${title}</h5>
+                                            <p class="card-text contents_ellipsis">${contents}</p>
+                                        </div>
+                                     </div>`
+
+                        $('#card_list').append(temp_html)
+                    }
+                }
+            })
+
+        }
+
+        function toRead() {
+
+            let id = $('#article_id').val();
+            let user_id = $('#user_id').val();
+
+            $.ajax({
+                type: "GET",
+                url: "/api/read",
+                data: {article_id: id, user_id: user_id},
+                success: function (response) { // 성공하면
+                    alert(response["msg"]);
+                    //read로 가기
+                }
+            })
+
+        }
+
+
+        function goSearch() {
+
+            var value = $('#searchWords').val();
+            console.log('value : ' + value)
+
+            $.ajax({
+                type: "POST",
+                url: "/api/search",
+                data: {words_give: value},
+                success: function (response) {
+                    console.log('success')
+                    let find_list = response['searched_list']
+                    console.log('search response : ' + find_list)
+                    $('#card_list').empty()
+                    for (let i = 0; i < find_list.length; i++) {
+                        let title = find_list[i]['title']
+                        let contents = find_list[i]['contents']
+                        let id = find_list[i]['_id']
+                        console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
+
+                        let temp_html = `<div class="card w-100 mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title title_ellipsis">${title}</h5>
+                                                <p class="card-text contents_ellipsis">${contents}</p>
+                                                <input type="hidden" id="article_id" value="${id}">
+                                            </div>
+                                         </div>`
+
+                        $('#card_list').append(temp_html)
+                    }
+                }
+            })
+
+        }
+
+        function toWrite() {
+            //로그인 상태 구분하여 분기 구현
+            //로그인시 글쓰기 페이지 이동, 비로그인시 로그인페이지 이동
+            //글쓰기 페이지 이동시, ajax를 이용하여 _id값을 갖고 이동
+
+            window.location.href = "/write";
+
+        }
+
+        function toLogin() {
+
+            window.location.href = "/login";
+
+        }
+
+    </script>
+
 </head>
+
+
 <body>
-지식 in overflow
+
+<div class="wrapper">
+    <div class="has-text-centered">
+        <label class="is-size-3 has-text-success">지식 in overflow</label>
+    </div>
+    <input type="hidden" id="user_id" value="{{ userId }}">
+    <div class="div1">
+        <button type="button" class="loginBtn btn btn-dark" onclick="toLogin()">로그인</button>
+    </div>
+
+    <div class="search_box">
+        <div class="input-group mb-3">
+            <input id="searchWords" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
+                   aria-describedby="button-addon2">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="goSearch()">검색</button>
+        </div>
+    </div>
+
+    <div id="card_list" class="card_list">
+
+        {% if list|length %}
+            {% for item in list %}
+
+                <div class="card w-100 mb-3">
+                    <div class="card-body article_body" onclick="toRead()">
+                        <h5 class="card-title title_ellipsis">{{ item.title }}</h5>
+                        <p class="card-text contents_ellipsis">{{ item.contents }}</p>
+                        <input type="hidden" id="article_id" value="{{ item._id }}">
+                    </div>
+                </div>
+
+            {% endfor %}
+        {% endif %}
+
+
+        <div class="card w-100 mb-3">
+            <div class="card-body">
+                <h5 class="card-title title_ellipsis">dummy</h5>
+                <p class="card-text contents_ellipsis">dummy</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="div1">
+
+        <button type="button" class="loginBtn btn btn-dark" onclick="toWrite()">글쓰기</button>
+
+    </div>
+
+
+</div>
 </body>
 </html>

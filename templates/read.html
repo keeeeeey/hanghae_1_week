@@ -127,44 +127,7 @@
     </style>
 
      <script>
-        $(document).ready(function(){
-        });
 
-        function posting() {
-            let id = $('#user_id').val();
-            let title = $('#title').val();
-            let content = $('#contents').val();
-            //let form_data = new FormData()
-
-            //form_data.append("title_give", title)
-            //form_data.append("content_give", content)
-
-            $.ajax({
-                type: "POST",
-                url: "/api/posting",
-                data: {
-                    'id_give' :id,
-                    'title_give':title,
-                    'content_give':content
-                },
-                success: function (response) {
-                    if (response["result"] == "success") {
-                        alert(response["msg"]);
-                        window.location.reload();
-                        location.replace("/");
-                        //main page move
-                    }
-                }
-            })
-        }
-
-        function cancel(){
-            if(!confirm("정말로 취소하시겠습니까?")){
-                return;
-            } else{
-                location.replace("/"); //main page local address
-            }
-        }
 
      </script>
     </head>
@@ -177,10 +140,10 @@
     <div class="body">
         <div class="wrap">
             <div class="article">
-              <span id="span_tag">질문</span><input class="ipbox_question" id="title">
+              <span id="span_tag">질문</span><input class="ipbox_question" id="title" readonly>
             </div>
             <div class="main_body">
-                <textarea class="textarea_contents" id="contents"></textarea>
+                <textarea class="textarea_contents" id="contents" readonly></textarea>
             </div>
             <div class="buttons">
                 <button id="button" onclick="posting()">질문 등록</button>
