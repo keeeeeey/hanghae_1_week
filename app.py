@@ -108,11 +108,11 @@ def read():
     token_receive = request.cookies.get('mytoken')
     print('article_id : ' + article_id)
     target_article = db.article.find_one({'_id': ObjectId(article_id)})
-    # print('target_article : ' + str(target_article))
-    # reply_on_article = list(db.reply.find({'article_id', article_id}, {'_id':False}))
-    # print('reply on article : ' + str(reply_on_article))
+    print('target_article : ' + str(target_article))
+    reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+    print('reply on article : ' + str(reply_on_article))
     user_checker = True
-    return render_template('read.html', target_article=target_article, user_checker=user_checker)
+    return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article, user_checker=user_checker)
     # if token_receive is None:
     #     print("비로그인 to index")
     #     return render_template('login.html')
