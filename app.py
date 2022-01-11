@@ -136,36 +136,6 @@ def read():
     #     except jwt.exceptions.DecodeError:
     #         return redirect(url_for("login"))
 
-    question_list = list(db.article.find({}))
-    id_list = []
-
-    #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
-    for item in question_list:
-        id_list.append(str(item['_id']))
-
-    for i in range(len(question_list)):
-        del question_list[i]['_id']
-        question_list[i]['_id'] = id_list[i]
-
-    # jwt token 받아오기
-    token_receive = request.cookies.get('mytoken')
-
-    if token_receive is None:
-        print("비로그인 to index")
-        return render_template('index.html', list=question_list)
-    else:
-        print("로그인 to index")
-        try:
-            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
-
-            return render_template('index.html', list=question_list, userId=user_id)
-        except jwt.ExpiredSignatureError:
-            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-        except jwt.exceptions.DecodeError:
-            return redirect(url_for("login"))
-
-
 ## 글쓰기화면 보여주기
 @app.route('/write')
 def move_write():

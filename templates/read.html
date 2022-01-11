@@ -140,22 +140,16 @@
     <div class="body">
         <div class="wrap">
             <div class="article">
-              <span id="span_tag">질문</span><input class="ipbox_question" id="title" readonly>
+              <span id="span_tag">질문</span><input class="ipbox_question" id="title" value="{{ target_article.title }}" readonly>
             </div>
             <div class="main_body">
-                <textarea class="textarea_contents" id="contents" readonly></textarea>
+                <textarea class="textarea_contents" id="contents" readonly>{{ target_article.content }}</textarea>
             </div>
             <div class="buttons">
-                <button id="button" onclick="posting()">질문 등록</button>
-                <button id="button" onclick="cancel()">작성 취소</button>
+                <button id="button" onclick="posting()">질문 수정</button>
+                <button id="button" onclick="outArticle()">나가기</button>
             </div>
         </div>
     </div>
-=======
-    <title>read</title>
-</head>
-<body>
-
->>>>>>> 86b60e06f738438526e4c60baf65e356f9cb99ed
 </body>
 </html>
