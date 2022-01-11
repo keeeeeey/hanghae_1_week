@@ -46,7 +46,7 @@ def homework():
         print("로그인 to index")
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
+            user_id = db.user.find_one({"id": payload['id']})['id']
 
             return render_template('index.html', list=question_list, userId=user_id)
         except jwt.ExpiredSignatureError:
@@ -80,7 +80,7 @@ def write_post():
 
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
-## 글쓰기화면 보여주기
+## 로그인화면 보여주기
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -131,18 +131,15 @@ def sign_in():
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
-    print(username_receive)
-    print(password_receive)
-
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
+    result = db.user.find_one({'id': username_receive, 'password': pw_hash})
 
     if result is not None:
         payload = {
         'id': username_receive,
         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
