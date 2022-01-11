@@ -1,0 +1,22 @@
+body {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.section {
+  width: 600px;
+  margin: 0 auto;
+}
+
+.is-safe {
+  color: #81c147;
+}
+
+.is-danger {
+  color: #ff0000;
+}

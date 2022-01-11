@@ -14,6 +14,17 @@ db = client.dbhanghae
 SECRET_KEY = 'SPARTA'
 
 
+## 로그인화면 보여주기
+@app.route('/login')
+def login():
+    return render_template('login.html', page_title='login')
+
+
+## register 화면 보여주기
+@app.route('/registerPage')
+def registerPage():
+    return render_template('register.html', page_title='register')
+
 ## HTML 화면 보여주기
 @app.route('/')
 def homework():
@@ -74,10 +85,6 @@ def write():
             return redirect(url_for("login"))
 
 
-## 로그인화면 보여주기
-@app.route('/login')
-def login():
-    return render_template('login.html', page_title='login')
 
 
 ## 글쓰기화면 보여주기
@@ -100,7 +107,7 @@ def search():
     return jsonify({'searched_list': find_list})
 
 
-## 글쓰기화면 보여주기
+## read화면 보여주기
 @app.route('/api/read')
 def read():
 
@@ -134,11 +141,6 @@ def read():
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
-
-## register 화면 보여주기
-@app.route('/registerPage')
-def registerPage():
-    return render_template('register.html')
 
 
 ## 로그인 API

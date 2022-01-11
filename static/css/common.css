@@ -1,5 +1,30 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Jua', sans-serif;
+}
+
+button {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+}
+
+button:focus {
+  outline: none;
+}
+
 .wrapper {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 60px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px;
+}
+
+/* header 스타일 */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
