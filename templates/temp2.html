@@ -27,6 +27,7 @@
     <!--<script src="../static/script/write.js" type="text/javascript" ></script>-->
 
     <style>
+
         * {
             font-family: 'Jua', sans-serif;
         }
@@ -178,18 +179,6 @@
 
         }
 
-        .reply {
-
-            margin-top: 20px;
-
-        }
-
-        .search_box {
-
-            margin-top: 20px;
-
-        }
-
     </style>
 
     <script>
@@ -240,22 +229,6 @@
             })
         }
 
-        function setReply() {
-
-            let article_id = $('#article_id').val();
-            let data = $('#replyData').val()
-
-            $.ajax({
-                    type: "POST",
-                    url: "/api/setReply",
-                    data: {articleID_give: article_id, reply_give: data},
-                    success: function (response) {
-
-                    }
-                })
-
-        }
-
     </script>
 </head>
 <body>
@@ -284,7 +257,7 @@
 
         <div class="search_box">
             <div class="input-group mb-3">
-                <input id="replyData" class="form-control" placeholder="답변을 입력하세요." aria-label="Recipient's username"
+                <input id="searchWords" class="form-control" placeholder="답변을 입력하세요." aria-label="Recipient's username"
                        aria-describedby="button-addon2">
                 <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="setReply()">답변하기
                 </button>

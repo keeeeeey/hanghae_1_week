@@ -124,6 +124,7 @@ def read():
             reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
             print('target article : ' + str(target_article))
             user_checker = False
+            print('reply_on_article : ' + str(reply_on_article))
 
             if target_article['user_id'] == user_id:
                 user_checker = True
@@ -217,6 +218,64 @@ def register():
     }
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
+
+
+@app.route('/api/like', methods=['POST'])
+def like():
+    id_receive = request.form['id_give']
+    checker = request.form['checker']
+    print('id_receive : ' + id_receive)
+    target_reply = db.reply.find_one({'_id': ObjectId(id_receive)})
+    print('target_reply : ' + str(target_reply))
+    good = target_reply['good']
+    print('checker : ' + checker)
+    print('before good : ' + good)
+    good = int(good)
+
+    if checker=='true':
+        print('like')
+        good += 1
+    else:
+        print('dislike')
+        good -= 1
+    print('after good : ' + str(good))
+    db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
+
+    return jsonify({'result': 'success', 'msg': '좋아요!'})
+
+
+@app.route('/api/setReply', methods=['POST'])
+def write_post():
+    articleID_receive = request.form['articleID_give']
+    reply_receive = request.form['reply_give']
+
+    doc = {
+        'article_id': articleID_receive,
+        'reply_data': reply_receive
+    }
+
+    db.article.insert_one(doc)
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    #여기서부터
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to write")
+        return render_template('login.html')
+    else:
+        try:
+            print("로그인 to write")
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+            print('user_id : ' + user_id)
+            return render_template('write.html', user_id=user_id)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

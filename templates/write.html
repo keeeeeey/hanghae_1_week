@@ -131,9 +131,11 @@
         });
         
         function posting() {
-            let id = $('#user_id').val();
+            let id = $('#user_id').text();
             let title = $('#title').val();
             let content = $('#contents').val();
+
+            console.log('check posting: ' + id)
             //let form_data = new FormData()
             
             //form_data.append("title_give", title)
