@@ -59,10 +59,11 @@ def write():
     token_receive = request.cookies.get('mytoken')
     # user_id = request.args.get('user_id')
     if token_receive is None:
-        print("비로그인 to index")
+        print("비로그인 to write")
         return render_template('login.html')
     else:
         try:
+            print("로그인 to write")
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
             print('user_id : ' + user_id)
@@ -186,7 +187,7 @@ def write_post():
     doc = {
         'user_id': id_receive,
         'title': title_receive,
-        'content': content_receive,
+        'contents': content_receive,
     }
 
     db.article.insert_one(doc)
