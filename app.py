@@ -1,7 +1,11 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
+
 from pymongo import MongoClient
+
 import jwt
+
 from datetime import datetime, timedelta
+
 import hashlib
 
 app = Flask(__name__)
@@ -19,6 +23,7 @@ SECRET_KEY = 'SPARTA'
 @app.route('/')
 def homework():
     print("home start")
+    return render_template('index.html')
 
     question_list = list(db.article.find({}))
     id_list = []
@@ -52,9 +57,28 @@ def homework():
 
 ## 글쓰기화면 보여주기
 @app.route('/write')
-def write():
-    return render_template('write.html')
+def move_write():   
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #지정된 token id filed
+    user_info = db.article.find_one({"user_id": payload['id']})
+    return render_template('write.html', user_id = user_info["user_id"])
 
+@app.route('/api/posting', methods=['POST'])
+def write_post():
+    id_receive = request.form['id_give']
+    title_receive = request.form['title_give']
+    content_receive = request.form['content_give']   
+
+    doc = {
+        'user_id': id_receive,
+        'title': title_receive,
+        'content': content_receive,
+    }
+
+    db.article.insert_one(doc)
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
 ## 글쓰기화면 보여주기
 @app.route('/login')
