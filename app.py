@@ -37,15 +37,18 @@ def homework():
         print("비로그인 to index")
         return render_template('index.html', list=question_list)
     else:
-        print("로그인 to index")
+        print("로그인 to index" + token_receive)
         try:
+            print('try: ')
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
-
+            user_id = db.user.find_one({"id": payload['id']})['id']
+            print('list : ' + str(question_list) + ' user_id : ' + user_id)
             return render_template('index.html', list=question_list, userId=user_id)
         except jwt.ExpiredSignatureError:
+            print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
+            print('case2')
             return redirect(url_for("login"))
 
 
@@ -61,9 +64,9 @@ def write():
     else:
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
-
-            return render_template('write.html', userId=user_id)
+            user_id = db.user.find_one({"id": payload['id']})['id']
+            print('user_id : ' + user_id)
+            return render_template('write.html', user_id=user_id)
         except jwt.ExpiredSignatureError:
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
@@ -104,25 +107,24 @@ def read():
 
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
-    target_article = db.article.find_one({'_id': ObjectId(article_id)})
-    reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+
     # user_checker = True
     # return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article, user_checker=user_checker)
     if token_receive is None:
-        print("비로그인 to index")
+        print("비로그인 to read")
         return render_template('login.html')
     else:
-        print("로그인 to index")
+        print("로그인 to read")
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
+            user_id = db.user.find_one({"id": payload['id']})['id']
 
             target_article = db.article.find_one({'_id': ObjectId(article_id)})
-            reply_on_article = list(db.reply.find({'article_id', article_id}))
-
+            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            print('target article : ' + str(target_article))
             user_checker = False
 
-            if target_article[user_id] == user_id:
+            if target_article['user_id'] == user_id:
                 user_checker = True
             print('render_template : to read.html')
             return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
@@ -137,6 +139,7 @@ def read():
 def registerPage():
     return render_template('register.html')
 
+
 ## 로그인 API
 @app.route('/api/login', methods=['POST'])
 def sign_in():
@@ -144,18 +147,15 @@ def sign_in():
     username_receive = request.form['username_give']
     password_receive = request.form['password_give']
 
-    print(username_receive)
-    print(password_receive)
-
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
-    print('check login result : ' + result)
+    result = db.user.find_one({'id': username_receive, 'password': pw_hash})
+
     if result is not None:
         payload = {
         'id': username_receive,
         'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -175,6 +175,24 @@ def nicknameCheck():
     nickname_receive = request.form['nickname_give']
     exists = bool(db.user.find_one({"nickname": nickname_receive}))
     return jsonify({'result': 'success', 'exists': exists})
+
+
+@app.route('/api/posting', methods=['POST'])
+def write_post():
+    id_receive = request.form['id_give']
+    title_receive = request.form['title_give']
+    content_receive = request.form['content_give']   
+
+    doc = {
+        'user_id': id_receive,
+        'title': title_receive,
+        'content': content_receive,
+    }
+
+    db.article.insert_one(doc)
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
 
 ## 회원가입
 @app.route('/api/register', methods=['POST'])

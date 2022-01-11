@@ -58,11 +58,9 @@
 
     <script>
 
-        function toRead() {
+        function toRead(article_id) {
 
-            let id = $('#article_id').val();
-
-            window.location.href = "/api/read?article_id=" + id;
+            window.location.href = "/api/read?article_id=" + article_id;
 
         }
 
@@ -153,10 +151,9 @@
             {% for item in list %}
 
                 <div class="card w-100 mb-3">
-                    <div class="card-body article_body" onclick="toRead()">
+                    <div class="card-body article_body" onclick="toRead('{{ item._id }}')">
                         <h5 class="card-title title_ellipsis">{{ item.title }}</h5>
                         <p class="card-text contents_ellipsis">{{ item.contents }}</p>
-                        <input type="hidden" id="article_id" value="{{ item._id }}">
                     </div>
                 </div>
 
