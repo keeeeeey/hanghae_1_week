@@ -74,10 +74,10 @@ def write():
             return redirect(url_for("login"))
 
 
-## 글쓰기화면 보여주기
+## 로그인화면 보여주기
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    return render_template('login.html', page_title='login')
 
 
 ## 글쓰기화면 보여주기
