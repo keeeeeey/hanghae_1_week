@@ -40,7 +40,7 @@ def homework():
         print("로그인 to index")
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.users.find_one({"id": payload['id']})['id']
+            user_id = db.user.find_one({"id": payload['id']})['id']
 
             return render_template('index.html', list=question_list, userId=user_id)
         except jwt.ExpiredSignatureError:
@@ -61,7 +61,7 @@ def write():
     # else:
     # try:
     #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     user_id = db.users.find_one({"id": payload['id']})['id']
+    #     user_id = db.user.find_one({"id": payload['id']})['id']
     #
     #     return render_template('write.html', userId=user_id)
     # except jwt.ExpiredSignatureError:
@@ -119,7 +119,7 @@ def read():
     #     print("로그인 to index")
     #     try:
     #         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #         user_id = db.users.find_one({"id": payload['id']})['id']
+    #         user_id = db.user.find_one({"id": payload['id']})['id']
     #
     #         target_article = db.article.find_one({'_id': ObjectId(article_id)})
     #         reply_on_article = list(db.reply.find({'article_id', article_id}))
@@ -184,7 +184,7 @@ def sign_in():
     print(password_receive)
 
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
-    result = db.users.find_one({'username': username_receive, 'password': pw_hash})
+    result = db.user.find_one({'id': username_receive, 'password': pw_hash})
     print('check login result : ' + result)
     if result is not None:
         payload = {
@@ -193,7 +193,7 @@ def sign_in():
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
-        return jsonify({'result': 'success', 'mytoken': token})
+        return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
