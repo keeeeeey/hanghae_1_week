@@ -1,10 +1,9 @@
+from bson import ObjectId
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
 import jwt
 from datetime import datetime, timedelta
 import hashlib
-
-app = Flask(__name__)
 
 # client = MongoClient('mongodb://test:test@localhost', 27017)
 
@@ -19,6 +18,14 @@ SECRET_KEY = 'SPARTA'
 @app.route('/')
 def homework():
     print("home start")
+
+    # 저장 - 예시
+    doc = {'user_id': 'bobby', 'title': 'dummy title','contents':'dummy contents'}
+    db.article.insert_one(doc)
+    doc = {'user_id': 'charlie', 'title': 'dummy title for charlie','contents':'dummy contents for charlie'}
+    db.article.insert_one(doc)
+    doc = {'user_id': 'danny', 'title': 'dummy title for danny','contents':'dummy contents for danny'}
+    db.article.insert_one(doc)
 
     question_list = list(db.article.find({}))
     id_list = []
@@ -53,7 +60,24 @@ def homework():
 ## 글쓰기화면 보여주기
 @app.route('/write')
 def write():
-    return render_template('write.html')
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    user_id = request.args.get('user_id')
+    # if token_receive is None:
+    #     print("비로그인 to index")
+    #     return render_template('login.html')
+    # else:
+    # try:
+    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #     user_id = db.users.find_one({"id": payload['id']})['id']
+    #
+    #     return render_template('write.html', userId=user_id)
+    # except jwt.ExpiredSignatureError:
+    #     return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    # except jwt.exceptions.DecodeError:
+    #     return redirect(url_for("login"))
+
+    return render_template('write.html', userId=user_id)
 
 
 ## 글쓰기화면 보여주기
@@ -87,13 +111,39 @@ def search():
 def read():
 
     article_id = request.args.get('article_id')
-    user_id = request.args.get('user_id')
 
-    target_article = db.article.find_one({'_id': article_id})
-    reply_on_article = list(db.reply.find({'article_id', article_id}))
-
-    return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article)
-
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    print('article_id : ' + article_id)
+    target_article = db.article.find_one({'_id': ObjectId(article_id)})
+    # print('target_article : ' + str(target_article))
+    # reply_on_article = list(db.reply.find({'article_id', article_id}, {'_id':False}))
+    # print('reply on article : ' + str(reply_on_article))
+    user_checker = True
+    return render_template('read.html')
+    # if token_receive is None:
+    #     print("비로그인 to index")
+    #     return render_template('login.html')
+    # else:
+    #     print("로그인 to index")
+    #     try:
+    #         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #         user_id = db.users.find_one({"id": payload['id']})['id']
+    #
+    #         target_article = db.article.find_one({'_id': ObjectId(article_id)})
+    #         reply_on_article = list(db.reply.find({'article_id', article_id}))
+    #
+    #         user_checker = False
+    #
+    #         if target_article[user_id] == user_id:
+    #             user_checker = True
+    #         print('render_template : to read.html')
+    #         return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
+    #                                user_checker=user_checker)
+    #     except jwt.ExpiredSignatureError:
+    #         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    #     except jwt.exceptions.DecodeError:
+    #         return redirect(url_for("login"))
 
 ## register 화면 보여주기
 @app.route('/registerPage')
@@ -112,7 +162,7 @@ def sign_in():
 
     pw_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
     result = db.users.find_one({'username': username_receive, 'password': pw_hash})
-
+    print('check login result : ' + result)
     if result is not None:
         payload = {
         'id': username_receive,
