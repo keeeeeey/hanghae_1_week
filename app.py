@@ -19,14 +19,6 @@ SECRET_KEY = 'SPARTA'
 def homework():
     print("home start")
 
-    # 저장 - 예시
-    doc = {'user_id': 'bobby', 'title': 'dummy title','contents':'dummy contents'}
-    db.article.insert_one(doc)
-    doc = {'user_id': 'charlie', 'title': 'dummy title for charlie','contents':'dummy contents for charlie'}
-    db.article.insert_one(doc)
-    doc = {'user_id': 'danny', 'title': 'dummy title for danny','contents':'dummy contents for danny'}
-    db.article.insert_one(doc)
-
     question_list = list(db.article.find({}))
     id_list = []
 
@@ -120,7 +112,7 @@ def read():
     # reply_on_article = list(db.reply.find({'article_id', article_id}, {'_id':False}))
     # print('reply on article : ' + str(reply_on_article))
     user_checker = True
-    return render_template('read.html')
+    return render_template('read.html', target_article=target_article, user_checker=user_checker)
     # if token_receive is None:
     #     print("비로그인 to index")
     #     return render_template('login.html')
