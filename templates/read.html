@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>read</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+  </script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js">
+  </script>
+
+<body>
+  <section class="hero is-primary header">
+    <div class="hero-body">
+      <p class="title">지식IN overflow</p>
+      <span class="user-nickname">{{user_info['nickname']}}</span>
+    </div>
+  </section>
+  <div class="article-writer">writer</div>
+  <div class="article-title">title</div>
+  <div class="article-content">content</div>
+
+  <div class="replys">
+    <div class="reply-item">
+      <div class="reply-writer">{{reply_writer}}</div>
+      <div class="reply-comment">{{reply_comment}}</div>
+    </div>
+  </div>
+  <div class="reply-form">
+    <input type="text" class="reply-input" placeholder='comment'>
+    <button class="add-reply" onclick='addReply()'>add</button>
+  </div>
+</body>
+
+<script>
+  $( document ).ready( function () {
+    get_replys()
+  } )
+
+  function addReply() {
+    let comment = $( '.reply-input' ).val();
+    let today = new Date().toISOString()
+    $.ajax( {
+      type: 'POST',
+      url: '/api/read/add_reply',
+      data: {
+        // article_id_give: ,
+        comment_give: comment,
+      },
+      success: function ( response ) {
+        if ( response[ 'result' ] == 'success' ) {
+          alert( '코멘트가 등록되었습니다.' )
+          window.location.reload()
+        } else {
+          alert( 'error' )
+        }
+      },
+    } );
+  }
+
+  function get_replys() {
+    console.log('get replys')
+    $( ".replys" ).empty()
+    $.ajax( {
+      type: "GET",
+      url: "/api/read/get_reply",
+      data: {},
+      success: function ( response ) {
+        if ( response[ "result" ] == "success" ) {
+          let replys = response[ "replys" ]
+          for ( let i = 0; i < replys.length; i++ ) {
+            let reply = replys[ i ]
+            let html_temp = `<div class="reply-item">
+                                <div class="reply-writer">${reply['nickname']}</div>
+                                <div class="reply-comment">${reply['comment']}</div>
+                              </div>`
+            console.log(reply)
+            $( ".replys" ).append( html_temp )
+          }
+        }
+      }
+    } )
+  }
+</script>
+
+</html>

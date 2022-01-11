@@ -8,8 +8,6 @@ from datetime import datetime, timedelta
 
 import hashlib
 
-app = Flask(__name__)
-
 # client = MongoClient('mongodb://test:test@localhost', 27017)
 
 app = Flask(__name__)
@@ -106,18 +104,44 @@ def search():
     return jsonify({'searched_list': find_list})
 
 
-## 글쓰기화면 보여주기
-@app.route('/api/read')
+## read화면 보여주기
+@app.route('/read')
 def read():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"id": payload["id"]})
+        return render_template('read.html', user_info=user_info)
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
 
-    article_id = request.args.get('article_id')
-    user_id = request.args.get('user_id')
+## add reply API
+@app.route('/api/read/add_reply', methods=['POST'])
+def add_reply():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_nickname = db.user.find_one({"id": payload["id"]})['nickname']
+    
+    # article_id_receive = request.form['article_id_give']
+    comment_receive = request.form['comment_give']
+    doc = {
+        # "article_id": article_id_receive,
+        "mytoken": token_receive,
+        'nickname': user_nickname,
+        "comment": comment_receive,
+    }
+    db.replys.insert_one(doc)
+    return jsonify({'result': 'success'})
 
-    target_article = db.article.find_one({'_id': article_id})
-    reply_on_article = list(db.reply.find({'article_id', article_id}))
-
-    return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article)
-
+## reply 목록 받아오기
+@app.route('/api/read/get_reply', methods=['GET'])
+def get_replys():
+    replys = list(db.replys.find({}))
+    for reply in replys:
+        reply["_id"] = str(reply["_id"])
+    return jsonify({'result': 'success', 'replys': replys})
 
 ## register 화면 보여주기
 @app.route('/registerPage')
