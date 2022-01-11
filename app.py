@@ -245,19 +245,13 @@ def like():
 
 
 @app.route('/api/setReply', methods=['POST'])
-def write_post():
+def add_reply():
+
     articleID_receive = request.form['articleID_give']
     reply_receive = request.form['reply_give']
 
-    doc = {
-        'article_id': articleID_receive,
-        'reply_data': reply_receive
-    }
-
-    db.article.insert_one(doc)
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
-    #여기서부터
     # user_id = request.args.get('user_id')
     if token_receive is None:
         print("비로그인 to write")
@@ -267,8 +261,18 @@ def write_post():
             print("로그인 to write")
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
+
+            doc = {
+                'article_id': articleID_receive,
+                'user_id' : user_id,
+                'reply_data': reply_receive,
+                'good' : '0'
+            }
+
+            db.reply.insert_one(doc)
+
             print('user_id : ' + user_id)
-            return render_template('write.html', user_id=user_id)
+            return jsonify({'result': 'success', 'msg': '답변 작성이 완료되었습니다!'})
         except jwt.ExpiredSignatureError:
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
