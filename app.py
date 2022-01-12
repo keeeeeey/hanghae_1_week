@@ -85,10 +85,11 @@ def write():
     token_receive = request.cookies.get('mytoken')
     # user_id = request.args.get('user_id')
     if token_receive is None:
-        print("비로그인 to index")
+        print("비로그인 to write")
         return render_template('login.html')
     else:
         try:
+            print("로그인 to write")
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
             print('user_id : ' + user_id)
@@ -128,7 +129,6 @@ def search():
 def read():
 
     article_id = request.args.get('article_id')
-
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
 
@@ -143,16 +143,39 @@ def read():
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
 
+            # 페이지 값 (디폴트값 = 1)
+            page = request.args.get("page", 1, type=int)
+            # 한 페이지 당 몇 개의 게시물을 출력할 것인가
+            limit = 10
+
             target_article = db.article.find_one({'_id': ObjectId(article_id)})
-            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            all_reply = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}).skip((page - 1) * limit).limit(limit))
+
+            # 게시물의 총 개수 세기
+            tot_count = len(all_reply)
+            
+            # 마지막 페이지의 수 구하기
+            last_page_num = math.ceil(tot_count / limit)  # 반드시 올림을 해줘야함
+
+            # 페이지 블럭을 5개씩 표기
+            block_size = 5
+            # 현재 블럭의 위치 (첫 번째 블럭이라면, block_num = 0)
+            block_num = int((page - 1) / block_size)
+            # 현재 블럭의 맨 처음 페이지 넘버 (첫 번째 블럭이라면, block_start = 1, 두 번째 블럭이라면, block_start = 6)
+            block_start = (block_size * block_num) + 1
+            # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
+            block_end = block_start + (block_size - 1)
+
             print('target article : ' + str(target_article))
             user_checker = False
+            print('reply_on_article : ' + str(reply_on_article))
 
             if target_article['user_id'] == user_id:
                 user_checker = True
             print('render_template : to read.html')
             return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
-                                   user_checker=user_checker)
+                                   user_checker=user_checker, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
@@ -169,19 +192,12 @@ def write_post():
     doc = {
         'user_id': id_receive,
         'title': title_receive,
-        'content': content_receive,
+        'contents': content_receive,
     }
 
     db.article.insert_one(doc)
 
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
-
-
-## 글쓰기화면 보여주기
-@app.route('/readPage')
-def readPage():
-    # article = list(db.article.find({}, {'_id': False}))
-    return render_template('read.html')
 
 ## register 화면 보여주기
 @app.route('/registerPage')
@@ -253,6 +269,68 @@ def register():
     }
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
+
+
+@app.route('/api/like', methods=['POST'])
+def like():
+    id_receive = request.form['id_give']
+    checker = request.form['checker']
+    print('id_receive : ' + id_receive)
+    target_reply = db.reply.find_one({'_id': ObjectId(id_receive)})
+    print('target_reply : ' + str(target_reply))
+    good = target_reply['good']
+    print('checker : ' + checker)
+    print('before good : ' + good)
+    good = int(good)
+
+    if checker=='true':
+        print('like')
+        good += 1
+    else:
+        print('dislike')
+        good -= 1
+    print('after good : ' + str(good))
+    db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
+
+    return jsonify({'result': 'success', 'msg': '좋아요!'})
+
+
+@app.route('/api/setReply', methods=['POST'])
+def add_reply():
+
+    articleID_receive = request.form['articleID_give']
+    reply_receive = request.form['reply_give']
+
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to write")
+        return render_template('login.html')
+    else:
+        try:
+            print("로그인 to write")
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+
+            doc = {
+                'article_id': articleID_receive,
+                'user_id' : user_id,
+                'reply_data': reply_receive,
+                'good' : '0'
+            }
+
+            db.reply.insert_one(doc)
+
+            print('user_id : ' + user_id)
+            return jsonify({'result': 'success', 'msg': '답변 작성이 완료되었습니다!'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=8000, debug=True)
