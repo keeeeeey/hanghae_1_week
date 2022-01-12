@@ -44,9 +44,21 @@
             justify-content: flex-end;
         }
 
-        .loginBtn {
-            margin: 50px;
+        .user_nickname {
+            margin: 55px 15px 50px 0;
 
+        }
+
+        .loginBtn {
+            margin: 50px 25px;
+        }
+
+        .mypageBtn {
+            margin: 50px 5px 50px 0;
+        }
+
+        .logoutBtn {
+            margin: 50px 25px 50px 0;
         }
 
         .title_ellipsis {
@@ -147,13 +159,20 @@
 
         function toLogin() {
 
-            if (user_id === "") {
-                alert('로그인이 필요합니다.')
-                window.location.href = "/login";
-            } else {
-                alert('다른 유저로 로그인 하시겠습니까?')
-                document.location.href = "/login";
-            }
+            window.location.href = "/login";
+
+        }
+
+        function toLogout(){
+
+            $.removeCookie('mytoken');
+            window.location.href='/'
+
+        }
+
+        function toMypage() {
+
+            window.location.href = "/api/mypage";
 
         }
 
@@ -168,10 +187,22 @@
     <div class="main_title has-text-centered has-background-success">
         <label class="main_text is-size-3 has-text-white">지식 in overflow</label>
     </div>
-    <div class="div1">
-        <input type="hidden" id="user_id" value="{{ userId }}">
-        <button type="button" class="loginBtn btn btn-dark" onclick="toLogin()">로그인</button>
-    </div>
+
+    {% if userId %}
+
+        <div class="div1">
+            <p class="user_nickname"><span id="user_nickname">{{userNickname}}</span> 님</p>
+            <button type="button" class="mypageBtn btn btn-dark" onclick="toMypage()">마이페이지</button>
+            <button type="button" class="logoutBtn btn btn-dark" onclick="toLogout()">로그아웃</button>
+        </div>
+
+    {% else %}
+
+        <div class="div1">
+            <button type="button" class="loginBtn btn btn-dark" onclick="toLogin()">로그인</button>
+        </div>
+
+    {% endif %}
 
     <div class="search_box">
         <div class="input-group mb-3">

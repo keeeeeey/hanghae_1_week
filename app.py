@@ -66,10 +66,11 @@ def homework():
             print('try: ')
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
+            user_nickname = db.user.find_one({"id": payload['id']})['nickname']
 
             print('list : ' + str(question_list) + ' user_id : ' + user_id)
 
-            return render_template('index.html', list=question_list, userId=user_id, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
+            return render_template('index.html', list=question_list, userId=user_id, userNickname=user_nickname, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
             print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
@@ -124,6 +125,27 @@ def search():
 
     return jsonify({'searched_list': find_list})
 
+## mypage 화면
+@app.route('/api/mypage')
+def toMypage():
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+
+    if token_receive is None:
+        print("비로그인 to read")
+        return render_template('login.html')
+    else:
+        print("로그인 to read")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})
+
+            return render_template('mypage.html', userId=user_id)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
 ## 글쓰기화면 보여주기
 @app.route('/api/read')
 def read():
@@ -154,7 +176,7 @@ def read():
 
             # 게시물의 총 개수 세기
             tot_count = len(all_reply)
-            
+
             # 마지막 페이지의 수 구하기
             last_page_num = math.ceil(tot_count / limit)  # 반드시 올림을 해줘야함
 
