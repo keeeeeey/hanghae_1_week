@@ -3,7 +3,7 @@
 <head>
 
     <!-- Webpage Title -->
-    <title>Hello, world!</title>
+    <title>register</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -15,12 +15,45 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-    <style>
-        .section {
-            width: 600px;
-            margin: 0 auto;
-            padding-top: 100px;
-        }
+    <style>        
+
+      .header{ 
+         position: fixed;
+         display: flex;     
+         justify-content: flex-start;    
+         align-items: center;
+         padding: 0px;
+         width: 100%;
+         height: 100px;   
+         text-align: center; 
+         font-size: 6px;    
+         color: white; 
+         background-color: #00d1b2;
+      }  
+      
+       /* body 스타일 */
+      .body{  
+          display: flex;
+          justify-content: center;             
+      }
+      /* 내용부분body */
+      .wrap{
+         display:flex;
+         justify-content: center;
+         padding:20px;
+         width: 800px; /* 크기지정 */
+         height: 450px;          
+         margin-top: 70px;             
+      }   
+
+      .title_name{
+        font-size:35px;
+        padding-left:50px;
+        color:white;
+      }
+      .hero-body{ 
+        padding: 0px;
+      }
 
         .is-safe {
             color: #81c147;
@@ -240,139 +273,138 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-<section class="hero is-primary is-bold" style="height: 150px; padding-top: 10px;">
-    <div class="hero-body">
-        <div class="container">
-            <h1 class="title">
-                지식 in stackoverflow
-            </h1>
 
+    <div class = "header">
+      <p class="title_name">지식IN overflow</p>      
+    </div>
+
+    <div class = "body">
+        <div class="wrap">
+            <div class="wrapper section has-text-centered">
+                <h1 class="title" style="margin-left: 50px;">회원가입 페이지</h1>
+                <div class="container" style="width:100%">
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userid">ID</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="text" class="input" id="userid" aria-describedby="emailHelp"
+                                           placeholder="My ID" onblur="idCheck()">
+                                </div>
+                                <p id="help-id" class="help">
+                                    아이디는 4-12자의 영문과 숫자만 입력 가능합니다.
+                                </p>
+                                <div id="messageID" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userpw">PW</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="password" class="input" id="userpw" placeholder="My Password"
+                                           onblur="pwValidation()">
+                                </div>
+                                <p id="help-password" class="help">
+                                    영문과 숫자 조합의 8-20자의 비밀번호를 설정해주세요.
+                                    특수문자(!@#$%^&*)도 사용 가능합니다.
+                                </p>
+                                <div id="messagePW" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userpw2">PW Check</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="password" class="input" id="userpw2" placeholder="My Password Check"
+                                           onblur="pwCheck()">
+                                </div>
+                                <div id="messagePW2" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="usernickname">NICKNAME</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="text" class="input" id="usernickname" placeholder="My NickName"
+                                           onblur="nicknameCheck()">
+                                </div>
+                                <div id="messageNickName" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userEmail">EMAIL</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="text" class="input" id="userEmail" placeholder="My Email" onblur="emailCheck()">
+                                </div>
+                                <div id="messageEmail" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userZipcode">ZIPCODE</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control" style="display: flex;">
+                                    <input type="text" class="input" id="userZipcode" placeholder="My Address" readonly>
+                                    <button class="button is-primary" style="margin-left: 10px;" onclick="findAddress()">주소 찾기
+                                    </button>
+                                </div>
+                                <div id="messageZipcode" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userAddress">ADDRESS</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="text" class="input" id="userAddress" placeholder="My Address" readonly>
+                                </div>
+                                <div style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label" for="userDetailAddress">DETAIL</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input type="text" class="input" id="userDetailAddress" placeholder="My Detail Address"
+                                           onblur="detailAddressCheck()">
+                                </div>
+                                <div id="messageDetailAddress" style="height: 20px; text-align: left;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="button is-primary" onclick="register()" style="margin-left: 50px;">회원가입</button>
+                </div>
+            </div>
         </div>
     </div>
-</section>
-<div class="section has-text-centered">
-    <h1 class="title" style="margin-left: 50px;">회원가입 페이지</h1>
-    <div class="container" style="width:100%">
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userid">ID</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="userid" aria-describedby="emailHelp"
-                               placeholder="My ID" onblur="idCheck()">
-                    </div>
-                    <p id="help-id" class="help">
-                        아이디는 4-12자의 영문과 숫자만 입력 가능합니다.
-                    </p>
-                    <div id="messageID" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userpw">PW</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="password" class="input" id="userpw" placeholder="My Password"
-                               onblur="pwValidation()">
-                    </div>
-                    <p id="help-password" class="help">
-                        영문과 숫자 조합의 8-20자의 비밀번호를 설정해주세요.
-                        특수문자(!@#$%^&*)도 사용 가능합니다.
-                    </p>
-                    <div id="messagePW" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userpw2">PW Check</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="password" class="input" id="userpw2" placeholder="My Password Check"
-                               onblur="pwCheck()">
-                    </div>
-                    <div id="messagePW2" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="usernickname">NICKNAME</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="usernickname" placeholder="My NickName"
-                               onblur="nicknameCheck()">
-                    </div>
-                    <div id="messageNickName" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userEmail">EMAIL</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="userEmail" placeholder="My Email" onblur="emailCheck()">
-                    </div>
-                    <div id="messageEmail" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userZipcode">ZIPCODE</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control" style="display: flex;">
-                        <input type="text" class="input" id="userZipcode" placeholder="My Address" readonly>
-                        <button class="button is-primary" style="margin-left: 10px;" onclick="findAddress()">주소 찾기
-                        </button>
-                    </div>
-                    <div id="messageZipcode" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userAddress">ADDRESS</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="userAddress" placeholder="My Address" readonly>
-                    </div>
-                    <div style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userDetailAddress">DETAIL</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="userDetailAddress" placeholder="My Detail Address"
-                               onblur="detailAddressCheck()">
-                    </div>
-                    <div id="messageDetailAddress" style="height: 20px; text-align: left;"></div>
-                </div>
-            </div>
-        </div>
-        <button class="button is-primary" onclick="register()" style="margin-left: 50px;">회원가입</button>
-    </div>
-</div>
 </body>
 </html>
