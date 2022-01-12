@@ -1,3 +1,5 @@
+import math
+
 from contextlib import nullcontext
 from bson import ObjectId, objectid
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
@@ -20,7 +22,29 @@ SECRET_KEY = 'SPARTA'
 def homework():
     print("home start")
 
-    question_list = list(db.article.find({}))
+    # 페이지 값 (디폴트값 = 1)
+    page = request.args.get("page", 1, type=int)
+    # 한 페이지 당 몇 개의 게시물을 출력할 것인가
+    limit = 10
+
+    list_all = list(db.article.find({}))
+
+    # 게시물의 총 개수 세기
+    tot_count = len(list_all)
+    print(tot_count)
+    # 마지막 페이지의 수 구하기
+    last_page_num = math.ceil(tot_count / limit)  # 반드시 올림을 해줘야함
+
+    # 페이지 블럭을 5개씩 표기
+    block_size = 5
+    # 현재 블럭의 위치 (첫 번째 블럭이라면, block_num = 0)
+    block_num = int((page - 1) / block_size)
+    # 현재 블럭의 맨 처음 페이지 넘버 (첫 번째 블럭이라면, block_start = 1, 두 번째 블럭이라면, block_start = 6)
+    block_start = (block_size * block_num) + 1
+    # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
+    block_end = block_start + (block_size - 1)
+
+    question_list = list(db.article.find({}).skip((page - 1) * limit).limit(limit))
     id_list = []
 
     #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
@@ -36,22 +60,24 @@ def homework():
 
     if token_receive is None:
         print("비로그인 to index")
-        return render_template('index.html', list=question_list)
+        return render_template('index.html', list=question_list, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
     else:
         print("로그인 to index" + token_receive)
         try:
             print('try: ')
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
+            user_nickname = db.user.find_one({"id": payload['id']})['nickname']
+
             print('list : ' + str(question_list) + ' user_id : ' + user_id)
-            return render_template('index.html', list=question_list, userId=user_id)
+
+            return render_template('index.html', list=question_list, userId=user_id, userNickname=user_nickname, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
             print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
             print('case2')
             return redirect(url_for("login"))
-
 
 ## 글쓰기화면 보여주기
 @app.route('/write')
@@ -101,7 +127,26 @@ def search():
     #정규식에 일치하는 값들만 빼옴
     return jsonify({'searched_list': find_list})
 
+## mypage 화면
+@app.route('/api/mypage')
+def toMypage():
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
 
+    if token_receive is None:
+        print("비로그인 to read")
+        return render_template('login.html')
+    else:
+        print("로그인 to read")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})
+
+            return render_template('mypage.html', userId=user_id)
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
 
 ## read 화면 보여주기
 @app.route('/api/read')
@@ -123,10 +168,33 @@ def read():
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
 
+                        # 페이지 값 (디폴트값 = 1)
+            page = request.args.get("page", 1, type=int)
+            # 한 페이지 당 몇 개의 게시물을 출력할 것인가
+            limit = 10
+
             target_article = db.article.find_one({'_id': ObjectId(article_id)})
-            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            all_reply = list(db.reply.find({'article_id':{'$regex':article_id}}))
+            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}).skip((page - 1) * limit).limit(limit))
+
+            # 게시물의 총 개수 세기
+            tot_count = len(all_reply)
+
+            # 마지막 페이지의 수 구하기
+            last_page_num = math.ceil(tot_count / limit)  # 반드시 올림을 해줘야함
+
+            # 페이지 블럭을 5개씩 표기
+            block_size = 5
+            # 현재 블럭의 위치 (첫 번째 블럭이라면, block_num = 0)
+            block_num = int((page - 1) / block_size)
+            # 현재 블럭의 맨 처음 페이지 넘버 (첫 번째 블럭이라면, block_start = 1, 두 번째 블럭이라면, block_start = 6)
+            block_start = (block_size * block_num) + 1
+            # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
+            block_end = block_start + (block_size - 1)
+
             print('target article : ' + str(target_article))
             user_checker = False
+            print('reply_on_article : ' + str(reply_on_article))
 
             if target_article['user_id'] == user_id:
                 user_checker = True
@@ -135,25 +203,51 @@ def read():
             ##조회수 추가
             none_viewvalue = list(db.article.find({'count':{'$exists': False }}))
             print(none_viewvalue)
-
+            ##조회수 컬럼이 없을경우
             for item in none_viewvalue:
                 print(item)
                 db.article.update_one({'_id': item['_id']}, {'$set': {'count':0}},False,True)            
-                
+            ##조회수 추가 함수    
             count = target_article['count'] + 1
             db.article.update_one({'_id':ObjectId(article_id)},{'$set':{'count': count}})
             
             return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
-                                   user_checker=user_checker)
+                                   user_checker=user_checker, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
+
+@app.route('/api/posting', methods=['POST'])
+def write_post():
+    id_receive = request.form['id_give']
+    title_receive = request.form['title_give']
+    content_receive = request.form['content_give'] 
+    count = 0  
+
+    doc = {
+        'user_id': id_receive,
+        'title': title_receive,
+        'contents': content_receive,
+        'count' : count
+    }
+
+    db.article.insert_one(doc)
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
 ## register 화면 보여주기
 @app.route('/registerPage')
 def registerPage():
     return render_template('register.html')
+
+## 글 삭제하기
+@app.route('/api/delete', methods=['POST'])
+def delete_article():
+    articleID_receive = request.form['articleID_give']
+    db.article.delete_one({'_id': ObjectId(articleID_receive)})
+    return jsonify({'result': 'success', 'msg': '삭제되었습니다'})
 
 
 ## 로그인 API
@@ -193,23 +287,6 @@ def nicknameCheck():
     return jsonify({'result': 'success', 'exists': exists})
 
 
-@app.route('/api/posting', methods=['POST'])
-def write_post():
-    id_receive = request.form['id_give']
-    title_receive = request.form['title_give']
-    content_receive = request.form['content_give'] 
-    count = 0  
-
-    doc = {
-        'user_id': id_receive,
-        'title': title_receive,
-        'contents': content_receive,
-        'count' : count
-    }
-
-    db.article.insert_one(doc)
-
-    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
 
 ## 회원가입
@@ -234,6 +311,66 @@ def register():
     }
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
+
+@app.route('/api/like', methods=['POST'])
+def like():
+    id_receive = request.form['id_give']
+    checker = request.form['checker']
+    print('id_receive : ' + id_receive)
+    target_reply = db.reply.find_one({'_id': ObjectId(id_receive)})
+    print('target_reply : ' + str(target_reply))
+    good = target_reply['good']
+    print('checker : ' + checker)
+    print('before good : ' + good)
+    good = int(good)
+
+    if checker=='true':
+        print('like')
+        good += 1
+    else:
+        print('dislike')
+        good -= 1
+    print('after good : ' + str(good))
+    db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
+
+    return jsonify({'result': 'success', 'msg': '좋아요!'})
+
+@app.route('/api/setReply', methods=['POST'])
+def add_reply():
+
+    articleID_receive = request.form['articleID_give']
+    reply_receive = request.form['reply_give']
+
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to write")
+        return render_template('login.html')
+    else:
+        try:
+            print("로그인 to write")
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+
+            doc = {
+                'article_id': articleID_receive,
+                'user_id' : user_id,
+                'reply_data': reply_receive,
+                'good' : '0'
+            }
+
+            db.reply.insert_one(doc)
+
+            print('user_id : ' + user_id)
+            return jsonify({'result': 'success', 'msg': '답변 작성이 완료되었습니다!'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
+    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
 
 ## 수정
 @app.route('/api/update', methods=['POST'])
