@@ -6,9 +6,6 @@
     <div class="control">
       <input class="input input-userID" placeholder="Enter your ID" />
     </div>
-    <p id="help-id" class="help">
-      아이디는 4-12자의 영문과 숫자만 입력 가능합니다.
-    </p>
     <p id="help-id-login" class="help is-danger"></p>
   </div>
 
@@ -20,10 +17,6 @@
         placeholder="Enter your PW"
       />
     </div>
-    <p id="help-password" class="help">
-      영문과 숫자 조합의 8-20자의 비밀번호를 설정해주세요. 특수문자(!@#$%^&*)도
-      사용 가능합니다.
-    </p>
     <p id="help-password-login" class="help is-danger"></p>
   </div>
 
@@ -37,49 +30,4 @@
     <button class="button is-primary" onclick="signIn()">Sign in</button>
   </div>
 </section>
-
-<script>
-  function signIn() {
-    alert('start signIn function for login');
-
-    let username = $('.input-userID').val();
-    let password = $('.input-userPW').val();
-
-    if (username == '') {
-      $('#help-id-login').text('아이디를 입력해주세요.');
-      $('.input-userID').focus();
-      return;
-    } else {
-      $('#help-id-login').text('');
-    }
-
-    if (password == '') {
-      $('#help-password-login').text('비밀번호를 입력해주세요.');
-      $('.input-userPW').focus();
-      return;
-    } else {
-      $('#help-password-login').text('');
-    }
-
-    alert('start ajax for login');
-
-    $.ajax({
-      type: 'POST',
-      url: '/api/login',
-      data: {
-        username_give: username,
-        password_give: password,
-      },
-      success: function (response) {
-        if (response['result'] == 'success') {
-          $.cookie('mytoken', response['token'], { path: '/' });
-          alert('로그인 완료!');
-          window.location.href = '/';
-        } else {
-          alert(response['msg']);
-        }
-      },
-    });
-  }
-</script>
 {% endblock %}

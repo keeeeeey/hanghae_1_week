@@ -1,22 +1,37 @@
 body {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 .section {
-  width: 600px;
-  margin: 0 auto;
+    width: 600px;
+    margin: 0 auto;
+}
+
+.join-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.join-btn {
+    margin-top: 1em;
+}
+
+.is-help {
+  font-size: 0.8rem;
+  text-align: start;
 }
 
 .is-safe {
-  color: #81c147;
+    color: #81c147;
 }
 
 .is-danger {
-  color: #ff0000;
+    color: #ff0000;
 }
