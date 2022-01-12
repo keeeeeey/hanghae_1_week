@@ -1,3 +1,4 @@
+from contextlib import nullcontext
 from bson import ObjectId, objectid
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
@@ -74,7 +75,7 @@ def write():
             return redirect(url_for("login"))
 
 
-## 글쓰기화면 보여주기
+## 로그인 화면 보여주기
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -86,21 +87,23 @@ def search():
     words_receive = request.form['words_give']
 
     find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
+    #'$option' : 'i' =>  대소문자를 구분하지 않는 정규식 일치 수행
 
     id_list = []
 
     # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
     for item in find_list:
         id_list.append(str(item['_id']))
-
+    #find_list의 '_id' 값을 string으로 conver 후 id_list에 append
     for i in range(len(find_list)):
         del find_list[i]['_id']
         find_list[i]['_id'] = id_list[i]
-
+    #정규식에 일치하는 값들만 빼옴
     return jsonify({'searched_list': find_list})
 
 
-## 글쓰기화면 보여주기
+
+## read 화면 보여주기
 @app.route('/api/read')
 def read():
 
@@ -128,6 +131,18 @@ def read():
             if target_article['user_id'] == user_id:
                 user_checker = True
             print('render_template : to read.html')
+
+            ##조회수 추가
+            none_viewvalue = list(db.article.find({'count':{'$exists': False }}))
+            print(none_viewvalue)
+
+            for item in none_viewvalue:
+                print(item)
+                db.article.update_one({'_id': item['_id']}, {'$set': {'count':0}},False,True)            
+                
+            count = target_article['count'] + 1
+            db.article.update_one({'_id':ObjectId(article_id)},{'$set':{'count': count}})
+            
             return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
                                    user_checker=user_checker)
         except jwt.ExpiredSignatureError:
@@ -182,12 +197,14 @@ def nicknameCheck():
 def write_post():
     id_receive = request.form['id_give']
     title_receive = request.form['title_give']
-    content_receive = request.form['content_give']   
+    content_receive = request.form['content_give'] 
+    count = 0  
 
     doc = {
         'user_id': id_receive,
         'title': title_receive,
         'contents': content_receive,
+        'count' : count
     }
 
     db.article.insert_one(doc)
