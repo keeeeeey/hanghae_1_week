@@ -97,6 +97,32 @@
             text-decoration: none;
         }
 
+        .view_sort{
+            display:flex;
+            justify-content: flex-end;
+            text-align: center;
+            margin:10px 10px;
+        }
+
+        .view_count {
+            float: right;
+            font-size:10px;
+        }
+
+        .footer{
+             position: fixed;
+             display: flex;
+             justify-content: center;
+             width: 100%; /* 크기지정 */
+             height: 30px;
+             padding: 10px;
+             bottom:0px;
+             background-color: #48c774;
+             color:white;
+             font-size: 5px;
+        }
+
+
     </style>
 
     <script>
@@ -106,6 +132,39 @@
 
         }
 
+        function makeBold(word,title) {
+
+            console.log('word :' + word); //TE
+            console.log('title :' + title);   //test
+
+            let low_word = word.toLowerCase();
+            let low_title = title.toLowerCase();
+
+            let word_length = low_word.length; //2
+            console.log('word_length :' + word_length);
+            let word_index = low_title.search(low_word);//0
+            console.log('word_index :' + word_index);
+            let title_text = title.substr(word_index,word_length).bold(); //<b>t<b>
+            console.log('title text :' + title_text);
+
+            let front_word = title.substr(0,word_index)//''
+            console.log('front_word :' + front_word);
+
+            let back_word = title.substr(word_index + word_length,title.length-1); //~~~~
+            console.log('back_word :' + back_word);
+
+            let full_word = front_word + title_text + back_word;
+            console.log('full_word :' + full_word);
+
+            return full_word;
+
+        }
+
+        function enterkey() {
+            if (window.event.keyCode == 13) {
+                goSearch();
+            }
+        }
 
         function goSearch() {
 
@@ -125,13 +184,15 @@
                         let title = find_list[i]['title']
                         let contents = find_list[i]['contents']
                         let id = find_list[i]['_id']
+                        let count = find_list[i]['count']
+
                         console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
 
                         let temp_html = `<div class="card w-100 mb-3">
-                                            <div class="card-body article_body" onclick="toRead()">
-                                                <h5 class="card-title title_ellipsis">${title}</h5>
+                                            <div class="card-body article_body" onclick="toRead('${id}')">
+                                                <h5 class="card-title title_ellipsis">${makeBold(value,title)}</h5>
                                                 <p class="card-text contents_ellipsis">${contents}</p>
-                                                <input type="hidden" id="article_id" value="${id}">
+                                                <p class ="view_count">Hits :<span id="view_counting">${count}</span></p>
                                             </div>
                                          </div>`
 
@@ -207,11 +268,13 @@
     <div class="search_box">
         <div class="input-group mb-3">
             <input id="searchWords" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
-                   aria-describedby="button-addon2">
+                   aria-describedby="button-addon2" onkeyup="enterkey()">
             <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="goSearch()">검색</button>
         </div>
     </div>
-
+    <div class="view_sort">
+        Hits 정렬
+    </div>
     <div id="card_list" class="card_list">
 
         {% if list|length %}
@@ -221,6 +284,7 @@
                     <div class="card-body article_body" onclick="toRead('{{ item._id }}')">
                         <h5 class="card-title title_ellipsis">{{ item.title }}</h5>
                         <p class="card-text contents_ellipsis">{{ item.contents }}</p>
+                        <p class="view_count">Hits :<span id="view_counting">{{ item.count }}</span></p>
                     </div>
                 </div>
 
@@ -260,6 +324,9 @@
     </div>
 
 
+</div>
+<div class = "footer">
+    foot
 </div>
 </body>
 </html>

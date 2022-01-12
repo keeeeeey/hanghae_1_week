@@ -1,6 +1,6 @@
 import math
-
-from bson import ObjectId
+from contextlib import nullcontext
+from bson import ObjectId, objectid
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
 import jwt
@@ -78,7 +78,6 @@ def homework():
             print('case2')
             return redirect(url_for("login"))
 
-
 ## 글쓰기화면 보여주기
 @app.route('/write')
 def write():
@@ -100,7 +99,7 @@ def write():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-## 글쓰기화면 보여주기
+## 로그인 화면 보여주기
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -112,17 +111,18 @@ def search():
     words_receive = request.form['words_give']
 
     find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
+    #'$option' : 'i' =>  대소문자를 구분하지 않는 정규식 일치 수행
 
     id_list = []
 
     # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
     for item in find_list:
         id_list.append(str(item['_id']))
-
+    #find_list의 '_id' 값을 string으로 conver 후 id_list에 append
     for i in range(len(find_list)):
         del find_list[i]['_id']
         find_list[i]['_id'] = id_list[i]
-
+    #정규식에 일치하는 값들만 빼옴
     return jsonify({'searched_list': find_list})
 
 ## mypage 화면
@@ -147,7 +147,7 @@ def toMypage():
             return redirect(url_for("login"))
 
 ## 회원정보 수정
-@app.route('/api/update', methods=['POST'])
+@app.route('/api/updateMember', methods=['POST'])
 def updateMember():
     user_pw = request.form['pw_give']
     user_zipcode = request.form['zipcode_give']
@@ -174,7 +174,7 @@ def updateMember():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-## 글쓰기화면 보여주기
+## read 화면 보여주기
 @app.route('/api/read')
 def read():
 
@@ -193,7 +193,9 @@ def read():
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
 
+
             # 페이지 값 (디폴트값 = 1)
+
             page = request.args.get("page", 1, type=int)
             # 한 페이지 당 몇 개의 게시물을 출력할 것인가
             limit = 10
@@ -224,6 +226,18 @@ def read():
             if target_article['user_id'] == user_id:
                 user_checker = True
             print('render_template : to read.html')
+
+            ##조회수 추가
+            none_viewvalue = list(db.article.find({'count':{'$exists': False }}))
+            print(none_viewvalue)
+            ##조회수 컬럼이 없을경우
+            for item in none_viewvalue:
+                print(item)
+                db.article.update_one({'_id': item['_id']}, {'$set': {'count':0}},False,True)            
+            ##조회수 추가 함수    
+            count = target_article['count'] + 1
+            db.article.update_one({'_id':ObjectId(article_id)},{'$set':{'count': count}})
+            
             return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
                                    user_checker=user_checker, limit=limit, page=page, block_start=block_start, block_end=block_end, last_page_num=last_page_num)
         except jwt.ExpiredSignatureError:
@@ -231,18 +245,19 @@ def read():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-
-
 @app.route('/api/posting', methods=['POST'])
 def write_post():
     id_receive = request.form['id_give']
     title_receive = request.form['title_give']
-    content_receive = request.form['content_give']
+
+    content_receive = request.form['content_give'] 
+    count = 0
 
     doc = {
         'user_id': id_receive,
         'title': title_receive,
         'contents': content_receive,
+        'count' : count
     }
 
     db.article.insert_one(doc)
@@ -290,7 +305,7 @@ def idCheck():
     exists = bool(db.user.find_one({"id": id_receive}))
     return jsonify({'result': 'success', 'exists': exists})
 
-## nickname 중복검사
+## nickname 중복검사    
 @app.route('/api/nicknameCheck', methods=['POST'])
 def nicknameCheck():
     nickname_receive = request.form['nickname_give']
@@ -320,7 +335,6 @@ def register():
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
 
-
 @app.route('/api/like', methods=['POST'])
 def like():
     id_receive = request.form['id_give']
@@ -343,7 +357,6 @@ def like():
     db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
 
     return jsonify({'result': 'success', 'msg': '좋아요!'})
-
 
 @app.route('/api/setReply', methods=['POST'])
 def add_reply():
@@ -381,6 +394,19 @@ def add_reply():
 
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
+## 수정
+@app.route('/api/update', methods=['POST'])
+def update_posting():
+    
+    id_receive = str(request.form['id_give']) 
+    print('id_receive : ' + id_receive)
+    id_convert = ObjectId(id_receive);    
+    title_receive = request.form['title_give']
+    content_receive = request.form['content_give']
+    
+    db.article.update_one({'_id':id_convert},{'$set':{'title': title_receive,'contents': content_receive}})
+
+    return jsonify({'result': 'success'})      
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=8000, debug=True)
