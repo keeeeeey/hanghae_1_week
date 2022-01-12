@@ -119,13 +119,33 @@ def read():
         try:
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
-
+            #글 제목, 내용 불러오기
             target_article = db.article.find_one({'_id': ObjectId(article_id)})
+            #해당 글의 댓글 불러오기
             reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
             print('target article : ' + str(target_article))
             user_checker = False
             print('reply_on_article : ' + str(reply_on_article))
+            reply_like_list = []
 
+            #댓글들의 좋아요 명단 가져오기
+            for item in reply_on_article:
+                like_list = item['good_bad']
+
+                if user_id in like_list:
+                    print('get in for : ')
+                    user_checker = True
+                    print('user_id : ' + user_id)
+                    print('user_checker : ' + str(user_checker))
+                else:
+                    user_checker=False
+                reply_like_list.append(user_checker)
+                user_checker=False
+
+            for i in range(len(reply_on_article)):
+                reply_on_article[i]['like_checker'] = reply_like_list[i]
+            print('reply_like_list : ' + str(reply_like_list))
+            print('reply_on_article : ' + str(reply_on_article))
             if target_article['user_id'] == user_id:
                 user_checker = True
             print('render_template : to read.html')
@@ -220,38 +240,6 @@ def register():
     return jsonify({'result': 'success'})
 
 
-@app.route('/api/likeCheck', methods=['POST'])
-def like_check():
-    reply_id_receive = request.form['reply_id_give']
-
-    # jwt token 받아오기
-    token_receive = request.cookies.get('mytoken')
-
-    # user_checker = True
-    # return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article, user_checker=user_checker)
-    if token_receive is None:
-        print("비로그인 to read")
-        return render_template('login.html')
-    else:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_id = db.user.find_one({"id": payload['id']})['id']
-
-    target = db.reply.find_one({'_id':ObjectId(reply_id_receive)})
-    like_list = target['good_bad']
-
-    user_checker = like_list[user_id]
-
-    if user_checker=='true':
-        #좋아요 누른 상태(좋아요 누를 수 없는 상태)
-        return jsonify({'result': 'success', 'checker': True})
-    elif user_checker=='false':
-        #싫어요 누른 상태(싫어요 누를 수 없는 상태)
-        return jsonify({'result': 'success', 'checker': False})
-    else:
-        #좋아요 누를 수 있는 상태
-        return jsonify({'result': 'success', 'checker': None})
-
-
 @app.route('/api/like', methods=['POST'])
 def like():
     id_receive = request.form['id_give']
@@ -268,43 +256,25 @@ def like():
 
     #좋아요를 누른 경우
     if checker=='true':
-        good += 1
-        checker_user = like_list['user_id']
-        print('checker_user : ' + checker_user)
-        if checker_user=='true':
-            #이미 좋아요 했기에 무효
-            print('좋아요->좋아요 무효' + checker_user)
-            return jsonify({'result': 'success', 'msg': '이미 좋아요 누르신 답변입니다.'})
-        elif checker_user=='false':
-            #싫어요->중립
-            print('싫어요->중립 ' + checker_user)
-            like_list['user_id'] = None
-        else :
-            #중립->좋아요
-            print('중립->좋아요 ' + checker_user)
-            like_list['user_id'] = True
-    #싫어요를 누른 경우
+
+        if user_id in like_list:
+            return jsonify({'result': 'success', 'msg': '잠시 후 다시 시도해주세요.'})
+        else:
+            good += 1
+            like_list.append(user_id)
+
+    #좋아요 취소를 누른 경우
     else:
-        good -= 1
-        checker_user = like_list['user_id']
-        print('checker_user : ' + checker_user)
-        if checker_user=='true':
-            #이미 좋아요 했기에 무효
-            print('좋아요->중립 ' + checker_user)
-            like_list['user_id'] = None
-        elif checker_user=='false':
-            #싫어요->중립
-            print('싫어요->싫어요 무효 ' + checker_user)
-            return jsonify({'result': 'success', 'msg': '이미 좋아요 누르신 답변입니다.'})
-        else :
-            #중립->좋아요
-            print('중립->싫어요 ' + checker_user)
-            like_list['user_id'] = False
+        for i in range(len(like_list)):
+            if like_list[i] == user_id:
+                del like_list[i]
+                good -= 1
+                break
 
     db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good_bad': like_list}})
     db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
 
-    return jsonify({'result': 'success', 'msg': '좋아요!'})
+    return jsonify({'result': 'success', 'msg': '!'})
 
 
 @app.route('/api/setReply', methods=['POST'])

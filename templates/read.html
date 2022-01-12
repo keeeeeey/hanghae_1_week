@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지식 in overflow Write_page</title>
 
     <!--Google Font Import-->
@@ -31,6 +30,8 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <% Boolean temp = false %>
 
     <style>
         * {
@@ -176,14 +177,6 @@
 
     <script>
 
-        $(document).ready(function(){
-
-            let temp = $({{ reply_on_article }})
-
-            console.log('start : ' + temp)
-
-        });
-
         function outArticle() {
             window.location.href = "/";
         }
@@ -223,15 +216,7 @@
                 success: function (response) {
                     if (response["result"] == "success") {
                         window.location.reload();
-                        console.log('after response checker : ' + checker)
 
-                        if (checker) {
-                            change_color("gray_green", "arrow_down")
-                            change_color("black", "arrow_up")
-                        } else {
-                            change_color("gray_green", "arrow_up")
-                            change_color("black", "arrow_down")
-                        }
                     }
                 }
             })
@@ -260,16 +245,6 @@
         function fnMove(seq) {
             var offset = $(seq).offset();
             $('html, body').animate({scrollTop: offset.top}, 400);
-        }
-
-        function change_color(val, id) {
-            var element = document.getElementById(id);
-            $('#arrow_up2').style.borderColor = "#8FB"
-            $('#arrow_up2').style.color = "#8FB"
-            $('#arrow_up2').style.borderTopColor = "#8FB"
-            $('#arrow_up2').style.borderRightColor = "#8FB"
-            if (val == "black") element.style.borderColor = "#000";
-            else if (val == "gray_green") element.style.borderColor = "#8FBC8F";
         }
 
     </script>
@@ -312,7 +287,6 @@
             {% if reply_on_article|length %}
                 {% for item in reply_on_article %}
 
-
                     <div class="row card">
                         <div class="col-9">
                             <div class="card-content reply-item">
@@ -321,15 +295,17 @@
                         </div>
                         <div class="col">
                             <div class="like-count">
-                                <button onclick="goLike('{{ item._id }}', true)">
-                                    <i id="like_filled" class="fa fa-thumbs-up"></i>
-                                    <i id="like_empty" class="far fa-thumbs-up"></i>
+                                <button>
+
+                                    {% if item.like_checker==true %}
+                                        <i id="like_filled" class="fa fa-thumbs-up" onclick="goLike('{{ item._id }}', false)"></i>
+                                    {% else %}
+                                        <i id="like_empty" class="far fa-thumbs-up" onclick="goLike('{{ item._id }}', true)"></i>
+                                    {% endif %}
+
                                 </button>
                                 <span class="reply-count">{{ item.good }}</span>
-                                <button onclick="goLike('{{ item._id }}', false)">
-                                    <i id="like_filled" class="fa fa-thumbs-down"></i>
-                                    <i id="like_empty" class="far fa-thumbs-down"></i>
-                                </button>
+
                             </div>
                         </div>
                     </div>
