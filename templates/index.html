@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>지식 in overflow</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -29,6 +33,12 @@
 
     <style>
 
+        *{
+
+            font-family: 'Gowun Dodum', sans-serif;
+
+        }
+
         .div1 {
             display: flex;
             justify-content: flex-end;
@@ -53,6 +63,36 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .card.w-100.mb-3{
+            cursor: pointer;
+            transition: all 0.3s ease 0s;
+        }
+        .card.w-100.mb-3:hover{
+            transform: translateY(-5px);
+        }
+
+        .main_title{
+
+            height: 250px;
+        }
+
+        .main_text{
+
+            margin: auto;
+            padding: 100px;
+        }
+        .footer{
+             position: fixed;
+             display: flex;
+             justify-content: center;
+             width: 100%; /* 크기지정 */
+             height: 30px;
+             padding: 10px;
+             bottom:0px;
+             background-color: #48c774;
+             color:white;
+             font-size: 5px;
+        }
 
     </style>
 
@@ -62,6 +102,40 @@
 
             window.location.href = "/api/read?article_id=" + article_id;
 
+        }
+
+        function makeBold(word,title) {     
+      
+            console.log('word :' + word); //TE
+            console.log('title :' + title);   //test
+
+            let low_word = word.toLowerCase();
+            let low_title = title.toLowerCase();
+
+            let word_length = low_word.length; //2
+            console.log('word_length :' + word_length);
+            let word_index = low_title.search(low_word);//0 
+            console.log('word_index :' + word_index);
+            let title_text = title.substr(word_index,word_length).bold(); //<b>t<b> 
+            console.log('title text :' + title_text);
+
+            let front_word = title.substr(0,word_index)//''
+            console.log('front_word :' + front_word); 
+            
+            let back_word = title.substr(word_index + word_length,title.length-1); //~~~~
+            console.log('back_word :' + back_word);  
+
+            let full_word = front_word + title_text + back_word;
+            console.log('full_word :' + full_word);     
+            
+            return full_word;    
+                                
+        }
+    
+        function enterkey() {
+        if (window.event.keyCode == 13) {
+                goSearch();
+            }
         }
 
 
@@ -83,13 +157,13 @@
                         let title = find_list[i]['title']
                         let contents = find_list[i]['contents']
                         let id = find_list[i]['_id']
+                        
                         console.log("in for[" + i + "] : " + title + " , " + contents + " , " + id)
 
                         let temp_html = `<div class="card w-100 mb-3">
-                                            <div class="card-body article_body" onclick="toRead()">
-                                                <h5 class="card-title title_ellipsis">${title}</h5>
+                                            <div class="card-body article_body" onclick="toRead('${id}')">
+                                                <h5 class="card-title title_ellipsis">${makeBold(value,title)}</h5>
                                                 <p class="card-text contents_ellipsis">${contents}</p>
-                                                <input type="hidden" id="article_id" value="${id}">
                                             </div>
                                          </div>`
 
@@ -98,11 +172,6 @@
                 }
             })
 
-        }
-        function logout() {
-            $.removeCookie('mytoken',{path:'/'});
-            alert('로그아웃!')
-            window.location.href="/login"
         }
 
         function toWrite() {
@@ -115,15 +184,30 @@
                 alert('로그인이 필요합니다.')
                 window.location.href = "/login";
             } else {
-                window.location.href = "/write?user_id="+user_id;
+                window.location.href = "/write?user_id=" + user_id;
             }
 
         }
 
         function toLogin() {
 
-            window.location.href = "/login";
+            if (user_id === "") {
+                alert('로그인이 필요합니다.')
+                window.location.href = "/login";
+            } else {
+                alert('다른 유저로 로그인 하시겠습니까?')
+                document.location.href = "/login";
+            }
 
+        }
+        function toLoginout() {
+            $.removeCookie('mytoken', {path: '/'});
+            let logout = confirm("로그아웃하시겠습니까?");
+            if(logout === true) {
+                window.location.href = "/login"                
+            } else {
+                return;
+            }
         }
 
     </script>
@@ -134,20 +218,21 @@
 <body>
 
 <div class="wrapper">
-    <div class="has-text-centered">
-        <label class="is-size-3 has-text-success">지식 in overflow</label>
+    <div class="main_title has-text-centered has-background-success">
+        <label class="main_text is-size-3 has-text-white">지식 in overflow</label>
     </div>
     <div class="div1">
         <input type="hidden" id="user_id" value="{{ userId }}">
         <button type="button" class="loginBtn btn btn-dark" onclick="toLogin()">로그인</button>
-        <button type="button" class="loginBtn btn btn-dark" onclick="logout()">로그아웃</button>
+        <button type="button" class="loginBtn btn btn-dark" onclick="toLoginout()">로그아웃</button>
+         <button type="button" class="loginBtn btn btn-dark" onclick="toWrite()">글쓰기</button>
     </div>
 
     <div class="search_box">
         <div class="input-group mb-3">
             <input id="searchWords" class="form-control" placeholder="검색어를 입력하세요." aria-label="Recipient's username"
-                   aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="goSearch()">검색</button>
+                   aria-describedby="button-addon2" onkeyup="enterkey()" >
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2"  onclick="goSearch()">검색</button>
         </div>
     </div>
 
@@ -175,13 +260,9 @@
         </div>
     </div>
 
-    <div class="div1">
-
-        <button type="button" class="loginBtn btn btn-dark" onclick="toWrite()">글쓰기</button>
-
-    </div>
-
-
+</div>
+<div class = "footer">
+    foot
 </div>
 </body>
 </html>
