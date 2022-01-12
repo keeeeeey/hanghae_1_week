@@ -31,8 +31,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <% Boolean temp = false %>
-
     <style>
         * {
             font-family: 'Jua', sans-serif;
@@ -172,10 +170,17 @@
         .card {
             margin: 0.3em 0;
         }
-
+        
     </style>
 
     <script>
+        $(document).ready(function () {
+
+            $('#read_reply').css('display', 'flex')
+            $('#modify_reply').css('display', 'none')
+
+        });
+
 
         function outArticle() {
             window.location.href = "/";
@@ -247,12 +252,69 @@
             $('html, body').animate({scrollTop: offset.top}, 400);
         }
 
+        function deleteReply(id) {
+            confirm('정말 삭제하시겠습니까?')
+
+            $.ajax({
+                type: "POST",
+                url: "/api/deleteReply",
+                data: {reply_id_give: id},
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
+                    fnMove(article_id)
+
+                }
+            })
+
+        }
+
+        function modifyReply(id) {
+            $('#modify_reply' + id).show()
+            $('#read_reply' + id).hide()
+            $('#modify_' + id).hide()
+            $('#delete_' + id).hide()
+            var temp = 'modify_reply' + id
+            fnMove(temp)
+        }
+
+        function init_hide(id) {
+            $('#' + id).hide()
+        }
+
+        function goModifyReply(id) {
+
+            modify_value = $('#modify_value_reply' + id).val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/modifyReply",
+                data: {
+                    reply_id_give: id,
+                    modify_value: modify_value
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
+                    fnMove(article_id)
+
+                }
+            })
+        }
+
+        function cancelModify(id) {
+            $('#modify_reply' + id).hide()
+            $('#read_reply' + id).show()
+            $('#modify_' + id).show()
+            $('#delete_' + id).show()
+        }
+
     </script>
 </head>
 <body>
 <div class="header">
     <a href="">지식 in OverFlow</a>
-    {#       <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>#}
+    <p class="user_id"><span id="user_id">{{ user_id }}</span>님</p>
 </div>
 
 <div class="body">
@@ -289,18 +351,38 @@
 
                     <div class="row card">
                         <div class="col-9">
-                            <div class="card-content reply-item">
-                                <p>{{ item.reply_data }}</p>
+                            <div class="card-content">
+
+                                <p id="read_reply{{ item._id }}">{{ item.reply_data }}</p>
+
+                                <div id="modify_reply{{ item._id }}">
+                                    <textarea cols="80" rows="20" id="modify_value_reply{{ item._id }}" type="text"
+                                              value="{{ item.reply_data }}"></textarea>
+                                    <input type="button" value="수정하기" onclick="goModifyReply('{{ item._id }}')">
+                                    <input type="button" value="취소" onclick="cancelModify('{{ item._id }}')">
+                                </div>
+                                <td>
+                                    <script>init_hide("modify_reply" + '{{ item._id }}')</script>
+                                </td>
+
                             </div>
                         </div>
                         <div class="col">
                             <div class="like-count">
+                                {% if user_id == item.user_id %}
+                                    <a id="modify_{{ item._id }}" href="#a" style="color:blue"
+                                       onclick="modifyReply('{{ item._id }}')">수정</a>
+                                    <a id="delete_{{ item._id }}" href="#a" style="color:red"
+                                       onclick="deleteReply('{{ item._id }}')">삭제</a>
+                                {% endif %}
                                 <button>
 
                                     {% if item.like_checker==true %}
-                                        <i id="like_filled" class="fa fa-thumbs-up" onclick="goLike('{{ item._id }}', false)"></i>
+                                        <i id="like_filled" class="fa fa-thumbs-up"
+                                           onclick="goLike('{{ item._id }}', false)"></i>
                                     {% else %}
-                                        <i id="like_empty" class="far fa-thumbs-up" onclick="goLike('{{ item._id }}', true)"></i>
+                                        <i id="like_empty" class="far fa-thumbs-up"
+                                           onclick="goLike('{{ item._id }}', true)"></i>
                                     {% endif %}
 
                                 </button>

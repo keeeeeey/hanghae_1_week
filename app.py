@@ -109,52 +109,43 @@ def read():
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
 
-    # user_checker = True
-    # return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article, user_checker=user_checker)
-    if token_receive is None:
-        print("비로그인 to read")
-        return render_template('login.html')
-    else:
-        print("로그인 to read")
-        try:
-            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_id = db.user.find_one({"id": payload['id']})['id']
-            #글 제목, 내용 불러오기
-            target_article = db.article.find_one({'_id': ObjectId(article_id)})
-            #해당 글의 댓글 불러오기
-            reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
-            print('target article : ' + str(target_article))
-            user_checker = False
-            print('reply_on_article : ' + str(reply_on_article))
-            reply_like_list = []
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_id = db.user.find_one({"id": payload['id']})['id']
+        #글 제목, 내용 불러오기
+        target_article = db.article.find_one({'_id': ObjectId(article_id)})
+        #해당 글의 댓글 불러오기
+        reply_on_article = list(db.reply.find({'article_id':{'$regex':article_id}}))
+        user_checker = False
+        reply_like_list = []
 
-            #댓글들의 좋아요 명단 가져오기
-            for item in reply_on_article:
-                like_list = item['good_bad']
-
-                if user_id in like_list:
-                    print('get in for : ')
-                    user_checker = True
-                    print('user_id : ' + user_id)
-                    print('user_checker : ' + str(user_checker))
-                else:
-                    user_checker=False
-                reply_like_list.append(user_checker)
-                user_checker=False
-
-            for i in range(len(reply_on_article)):
-                reply_on_article[i]['like_checker'] = reply_like_list[i]
-            print('reply_like_list : ' + str(reply_like_list))
-            print('reply_on_article : ' + str(reply_on_article))
-            if target_article['user_id'] == user_id:
+        #댓글들의 좋아요 명단 가져오기
+        for item in reply_on_article:
+            like_list = item['good_bad']
+            print("list : " + str(like_list))
+            if user_id in like_list:
                 user_checker = True
-            print('render_template : to read.html')
-            return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
-                                   user_checker=user_checker)
-        except jwt.ExpiredSignatureError:
-            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-        except jwt.exceptions.DecodeError:
-            return redirect(url_for("login"))
+            else:
+                user_checker=False
+            reply_like_list.append(user_checker)
+            user_checker=False
+
+        for i in range(len(reply_on_article)):
+            reply_on_article[i]['like_checker'] = reply_like_list[i]
+        if target_article['user_id'] == user_id:
+            user_checker = True
+
+        #정렬
+
+        reply_on_article = sorted(reply_on_article, key=lambda item: (-int(item['good'])))
+
+        print('render_template : to read.html')
+        return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
+                               user_checker=user_checker, user_id=user_id)
+    except jwt.ExpiredSignatureError:
+        return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    except jwt.exceptions.DecodeError:
+        return redirect(url_for("login"))
 
 ## register 화면 보여주기
 @app.route('/registerPage')
@@ -201,18 +192,34 @@ def nicknameCheck():
 
 @app.route('/api/posting', methods=['POST'])
 def write_post():
+    print('write_post start')
     id_receive = request.form['id_give']
+    print('id : ' + id_receive)
     title_receive = request.form['title_give']
-    content_receive = request.form['content_give']   
+    print('title : ' + title_receive)
+    content_receive = request.form['content_give']
+    print('receive data : ' + content_receive)
+    image = request.files['image']
+    extension = image.filename.split('.')
+    print('extension : ' + str(extension))
+    today=datetime.now()
+    mytime = today.strftime('%Yy%mm%dd%H:%M:%S')
+    filename = f'{mytime}-{extension[0]}'
+    filename = "".join(i for i in filename if i not in "\/:*?<>|")
+    filename = filename.strip()
+    print('filename : ' + filename)
+    save_to = f'static/images/{filename}.{extension[1]}.jpg'
+    image.save(save_to)
 
     doc = {
         'user_id': id_receive,
         'title': title_receive,
         'contents': content_receive,
+        'imageUrl' : f'{filename}.{extension[1]}.jpg'
     }
 
     db.article.insert_one(doc)
-
+    print('done, anyway')
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
 
@@ -299,7 +306,8 @@ def add_reply():
                 'article_id': articleID_receive,
                 'user_id' : user_id,
                 'reply_data': reply_receive,
-                'good' : '0'
+                'good' : '0',
+                'good_bad' : []
             }
 
             db.reply.insert_one(doc)
@@ -311,7 +319,66 @@ def add_reply():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-    return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
+
+@app.route('/api/deleteReply', methods=['POST'])
+def del_reply():
+
+    reply_id_receive = request.form['reply_id_give']
+
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to write")
+        return render_template('login.html')
+    else:
+        try:
+            print("로그인 to write")
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+
+            target = db.reply.find_one({'_id':ObjectId(reply_id_receive)})
+
+            if target['user_id'] == user_id:
+                db.reply.delete_one({'_id':ObjectId(reply_id_receive)})
+
+            print('user_id : ' + user_id)
+            return jsonify({'result': 'success', 'msg': '삭제가 완료되었습니다!'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
+
+@app.route('/api/modifyReply', methods=['POST'])
+def modify_reply():
+
+    reply_id_receive = request.form['reply_id_give']
+    modify_value = request.form['modify_value']
+    
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+    # user_id = request.args.get('user_id')
+    if token_receive is None:
+        print("비로그인 to write")
+        return render_template('login.html')
+    else:
+        try:
+            print("로그인 to write")
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            user_id = db.user.find_one({"id": payload['id']})['id']
+
+            target = db.reply.find_one({'_id':ObjectId(reply_id_receive)})
+
+            if target['user_id'] == user_id:
+                db.reply.update_one({'_id':ObjectId(reply_id_receive)},{'$set':{'reply_data':modify_value}})
+
+            print('user_id : ' + user_id)
+            return jsonify({'result': 'success', 'msg': '수정이 완료되었습니다!'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
 
 
 if __name__ == '__main__':
