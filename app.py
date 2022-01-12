@@ -15,11 +15,13 @@ db = client.dbhanghae
 
 SECRET_KEY = 'SPARTA'
 
-
 ## HTML 화면 보여주기
 @app.route('/')
 def homework():
     print("home start")
+
+    sortingType = request.args.get("sortingType")
+    print(sortingType)
 
     # 페이지 값 (디폴트값 = 1)
     page = request.args.get("page", 1, type=int)
@@ -43,7 +45,11 @@ def homework():
     # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
     block_end = block_start + (block_size - 1)
 
-    question_list = list(db.article.find({}).skip((page - 1) * limit).limit(limit))
+    question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
+    if sortingType == "hits":
+        question_list = list(db.article.find({}).sort("count",-1).skip((page - 1) * limit).limit(limit))
+    else:
+        question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
     id_list = []
 
     #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.

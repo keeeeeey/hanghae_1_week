@@ -300,7 +300,7 @@
 
         //update
         function update_posting() {
-            let id = $('#user_id').val();
+            let id = $('#article_id').val();
             console.log(id);
             let title = $('#input-title').val();
             let content = $('#textarea-content').val();
@@ -331,7 +331,7 @@
         <div class="article">
             <span id="span_tag">질문</span><input class="ipbox_question" id="title" value="{{ target_article.title }}"
                                                 readonly>
-            <input type="hidden" id="user_id" value="{{ target_article._id }}">
+            <input type="hidden" id="article_id" value="{{ target_article._id }}">
         </div>
         <div class="main_body">
             <textarea class="textarea_contents" id="contents" readonly>{{ target_article.contents }}</textarea>
