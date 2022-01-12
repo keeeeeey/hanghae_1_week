@@ -102,6 +102,7 @@
      resize: none;   
      overflow-y: scroll;                               
  } 
+
  .buttons{
      display: flex;
      margin-top: 20px;
@@ -135,12 +136,11 @@
             let title = $('#title').val();
             let content = $('#contents').val();
 
-            console.log('check posting: ' + id)
             //let form_data = new FormData()
             
             //form_data.append("title_give", title)
-            //form_data.append("content_give", content)
-            console.log(id);
+            //form_data.append("content_give", content) 
+
             $.ajax({
                 type: "POST",
                 url: "/api/posting",
@@ -173,7 +173,11 @@
 <body>
     <div class = "header">
         <a href="">지식 in OverFlow</a>
+<<<<<<< HEAD
         <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>
+=======
+       <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>
+>>>>>>> dde7b5744db02733877ec34c2968350446315636
     </div>
 
     <div class="body">  
