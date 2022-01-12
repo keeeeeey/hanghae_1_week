@@ -146,6 +146,34 @@ def toMypage():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
+## 회원정보 수정
+@app.route('/api/update', methods=['POST'])
+def updateMember():
+    user_pw = request.form['pw_give']
+    user_zipcode = request.form['zipcode_give']
+    user_address = request.form['address_give']
+    user_detail = request.form['detail_give']
+
+    pw_hash = hashlib.sha256(user_pw.encode('utf-8')).hexdigest()
+
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+
+    if token_receive is None:
+        print("비로그인 to read")
+        return render_template('login.html')
+    else:
+        print("로그인 to read")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            db.user.update_many({'id': payload['id']}, {'$set': {'password': pw_hash, 'zipcode': user_zipcode, 'address': user_address, 'detail': user_detail}})
+
+            return jsonify({'result': 'success'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
 ## 글쓰기화면 보여주기
 @app.route('/api/read')
 def read():
