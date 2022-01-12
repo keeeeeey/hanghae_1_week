@@ -184,12 +184,14 @@ def nicknameCheck():
 def write_post():
     id_receive = request.form['id_give']
     title_receive = request.form['title_give']
-    content_receive = request.form['content_give']   
+    content_receive = request.form['content_give']
+    image_receive = request.form['image_give']
 
     doc = {
         'user_id': id_receive,
         'title': title_receive,
         'contents': content_receive,
+        'images': image_receive,
     }
 
     db.article.insert_one(doc)
