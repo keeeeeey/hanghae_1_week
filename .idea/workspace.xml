@@ -5,7 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e9f72d26-7986-47f9-aea2-76c3abd9b9d9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/dbprac.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/2022y01m12d195144-Screenshot_20200707-134531_Netfilx_clone.jpg.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/images/2022y01m12d202634-캡처.PNG.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/hanghae_1_week.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/hanghae_1_week.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/mypage.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/mypage.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/read.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/read.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/write.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/write.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -132,7 +147,7 @@
       <workItem from="1641949278848" duration="32187000" />
       <workItem from="1641991275113" duration="848000" />
       <workItem from="1641992375667" duration="3453000" />
-      <workItem from="1642030004697" duration="1913000" />
+      <workItem from="1642030004697" duration="5029000" />
     </task>
     <servers />
   </component>
