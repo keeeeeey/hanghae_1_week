@@ -1,6 +1,6 @@
 # 제목 : 지식IN over flow
-- 배포 URL : www.naver.com
-- 구현 유튜브 영상 : www.youtube.com
+- 배포 URL : http://54.180.95.5/
+- 구현 유튜브 영상 : https://youtu.be/mU6tup7wXwo
 - github repo 주소 : https://github.com/keeeeeey/hanghae_1_week
 
 ## 설명
