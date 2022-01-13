@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지식 in overflow Write_page</title>
 
     <!--Google Font Import-->
@@ -32,6 +31,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
 
     <!-- Fontawesome Icon -->
     <script src="https://kit.fontawesome.com/c5929fafa9.js" crossorigin="anonymous"></script>
@@ -170,47 +170,6 @@
             transform: translateY(-5px);
         }
 
-        .arrow-up {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-up::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(315deg); /* 각도 */
-        }
-
-        .arrow-down {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-down::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(135deg); /* 각도 */
-        }
-
-        .like_value {
-
-            font-size: 20px;
-            margin: auto;
-
-        }
-
         .reply {
 
             margin-top: 20px;
@@ -307,7 +266,6 @@
         }
 
         function goLike(reply_id, checker) {
-            console.log('goLike: reply_id : ' + reply_id)
 
             $.ajax({
                 type: "POST",
@@ -319,15 +277,7 @@
                 success: function (response) {
                     if (response["result"] == "success") {
                         window.location.reload();
-                        console.log('after response checker : ' + checker)
 
-                        if (checker) {
-                            change_color("gray_green", "arrow_down")
-                            change_color("black", "arrow_up")
-                        } else {
-                            change_color("gray_green", "arrow_up")
-                            change_color("black", "arrow_down")
-                        }
                     }
                 }
             })
@@ -374,18 +324,18 @@
             console.log(id);
             let title = $('#input-title').val();
             let content = $('#textarea-content').val();
-             $.ajax({
+            $.ajax({
                 type: "POST",
                 url: "/api/update",
                 data: {
-                        id_give: id,
-                        title_give: title,
-                        content_give: content
-                        },
+                    id_give: id,
+                    title_give: title,
+                    content_give: content
+                },
                 success: function (response) {
                     alert("success")
                     window.location.replace('/')
-                    }
+                }
             })
         }
 
@@ -467,7 +417,6 @@
             $('#modify_' + id).show()
             $('#delete_' + id).show()
         }
-
     </script>
 </head>
 <body>
@@ -540,7 +489,6 @@
                                 <td>
                                     <script>init_hide("modify_reply" + '{{ item._id }}')</script>
                                 </td>
-
                             </div>
                         </div>
                         <div class="col">
@@ -567,7 +515,6 @@
                             </div>
                         </div>
                     </div>
-
                 {% endfor %}
             {% endif %}
 

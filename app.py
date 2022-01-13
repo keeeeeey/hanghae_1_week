@@ -1,5 +1,4 @@
 import math
-from contextlib import nullcontext
 from bson import ObjectId, objectid
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from pymongo import MongoClient
@@ -7,7 +6,7 @@ import jwt
 from datetime import datetime, timedelta
 import hashlib
 
-# client = MongoClient('mongodb://test:test@localhost', 27017)
+#client = MongoClient('mongodb://test:test@localhost', 27017)
 
 app = Flask(__name__)
 client = MongoClient('localhost', 27017)
@@ -204,15 +203,8 @@ def read():
         target_article = db.article.find_one({'_id': ObjectId(article_id)})
         # 해당 글의 댓글 불러오기
         reply_on_article = list(db.reply.find({'article_id': {'$regex': article_id}}))
-        ##조회수 추가
-        none_viewvalue = list(db.article.find({'count': {'$exists': False}}))
-        print(none_viewvalue)
-        ##조회수 컬럼이 없을경우
-        for item in none_viewvalue:
-            print(item)
-            db.article.update_one({'_id': item['_id']}, {'$set': {'count': 0}}, False, True)
+
         ##조회수 추가 함수
-        print('non_viewvalue : ' + str(none_viewvalue))
         count = target_article['count'] + 1
         db.article.update_one({'_id': ObjectId(article_id)}, {'$set': {'count': count}})
 
@@ -225,7 +217,7 @@ def read():
         all_reply = list(db.reply.find({'article_id': {'$regex': article_id}}))
 
         reply_on_article = list(
-            db.reply.find({'article_id': {'$regex': article_id}}).sort('good',1).skip((page - 1) * limit).limit(limit))
+            db.reply.find({'article_id': {'$regex': article_id}}).sort('good', 1).skip((page - 1) * limit).limit(limit))
 
         # 게시물의 총 개수 세기
         tot_count = len(all_reply)
@@ -263,8 +255,6 @@ def read():
         print('reply_on_article : ' + str(reply_on_article))
 
         user_checker = False
-        print('reply_on_article : ' + str(reply_on_article))
-
         if target_article['user_id'] == user_id:
             user_checker = True
         print('render_template : to read.html')
@@ -343,8 +333,9 @@ def write_post():
     content_receive = request.form['content_give']
     print('receive data : ' + content_receive)
     image_checker = request.form['image_checker']
-    print('image_checker='+image_checker)
-    if image_checker=='true':
+    print('image_checker=' + image_checker)
+
+    if image_checker == 'true':
         image = request.files['image']
         extension = image.filename.split('.')
         print('extension : ' + str(extension))
@@ -537,16 +528,16 @@ def modify_reply():
 ## 수정
 @app.route('/api/update', methods=['POST'])
 def update_posting():
-    
-    id_receive = str(request.form['id_give']) 
+
+    id_receive = str(request.form['id_give'])
     print('id_receive : ' + id_receive)
-    id_convert = ObjectId(id_receive);    
+    id_convert = ObjectId(id_receive);
     title_receive = request.form['title_give']
     content_receive = request.form['content_give']
-    
+
     db.article.update_one({'_id':id_convert},{'$set':{'title': title_receive,'contents': content_receive}})
 
-    return jsonify({'result': 'success'})      
+    return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=8000, debug=True)
