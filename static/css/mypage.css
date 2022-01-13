@@ -1,0 +1,36 @@
+
+.header {
+    position: fixed;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px;
+    width: 100%;
+    height: 100px;
+    text-align: center;
+    font-size: 6px;
+    color: white;
+    background-color: #00d1b2;
+    z-index: 99999
+}
+
+.title_name {
+    font-size: 27px;
+    padding-left: 50px;
+    color: white;
+}
+
+.section {
+    width: 600px;
+    height: 1000px;
+    margin: 0 auto;
+    padding-top: 180px;
+}
+
+.is-safe {
+    color: #81c147;
+}
+
+.is-danger {
+    color: #ff0000;
+}
