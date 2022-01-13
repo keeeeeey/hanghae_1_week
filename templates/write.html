@@ -63,7 +63,7 @@
             font-size: 0.8rem;
         }
 
-        #user_nickname {
+        #user_id {
             font-size: 1rem;
             font-weight: bold;
         }
@@ -142,6 +142,11 @@
 
             let id = $('#user_id').text();
             let title = $('#title').val();
+            let title_check = title.trim();
+            if(title_check == null || title_check == "") {
+                alert('title을 입력하세요')
+                return;
+            }
             let content = $('#contents').val();
 
             if (image_checker) {
@@ -217,34 +222,6 @@
             }
         }
 
-        $('#btnUpload').on('click', function (event) {
-            event.preventDefault();
-
-            var form = $('#uploadForm')[0]
-            var data = new FormData(form);
-
-            $('#btnUpload').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                enctype: 'multipart/form-data',
-                url: "/upload",
-                data: data,
-                processData: false,
-                contentType: false,
-                cache: false,
-                timeout: 600000,
-                success: function (data) {
-                    $('#btnUpload').prop('disabled', false);
-                    alert('success')
-                },
-                error: function (e) {
-                    $('#btnUpload').prop('disabled', false);
-                    alert('fail');
-                }
-            });
-        })
-
         function loadFile(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -255,6 +232,8 @@
                     $('#preview').toggleClass('is-hidden')
                 };
                 reader.readAsDataURL(input.files[0]);
+
+                image_checker = true
             }
         }
 
@@ -271,7 +250,7 @@
 
 <div class="wrapper">
     <div class="div1">
-        <p class="user_nickname"><span id="user_nickname">{{ user_id }}</span> 님</p>
+        <p class="user_nickname"><span id="user_id">{{ user_id }}</span> 님</p>
         <button type="button" class="mypageBtn button is-primary" onclick="toMypage()">마이페이지</button>
         <button type="button" class="logoutBtn button is-primary" onclick="toLogout()">로그아웃</button>
     </div>
