@@ -485,7 +485,7 @@
                                                        alt="My Image" style="margin:0px 5px 8px 0px">
         지식IN overflow
     </p>
-    {% if userId %}
+    {% if user_id %}
         <div class="div1">
             <!--<p class="user_nickname"><span id="user_nickname" style="font-weight:bold;">{{userNickname}}</span> 님 환영합니다</p>-->
             <p class="btns mypage_btn" onclick="toMypage()">마이페이지</p>
@@ -510,7 +510,9 @@
             <textarea class="textarea_contents" id="contents" readonly>{{ target_article.contents }}</textarea>
         </div>
 
-        <img class="img_show" src="./../static/images/{{ target_article.imageUrl }}" alt="description image">
+        {% if target_article.imageUrl %}
+            <img class="img_show" src="./../static/images/{{ target_article.imageUrl }}" alt="description image">
+        {% endif %}
 
         <div class="buttons">
             {% if user_checker %}
@@ -544,10 +546,10 @@
                                     <textarea cols="80" rows="20" id="modify_value_reply{{ item._id }}"
                                               type="text">{{ item.reply_data }}</textarea>
 
-                                        <input type="button" value="수정하기"
-                                               onclick="goModifyReply('{{ item._id }}')">
-                                        <input type="button" value="취소"
-                                               onclick="cancelModify('{{ item._id }}')">
+                                    <input type="button" value="수정하기"
+                                           onclick="goModifyReply('{{ item._id }}')">
+                                    <input type="button" value="취소"
+                                           onclick="cancelModify('{{ item._id }}')">
 
                                 </div>
                                 <td>
