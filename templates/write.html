@@ -48,19 +48,54 @@
             width: 100%;
         }
 
+        .header{ 
+        position: fixed;
+        display: flex;     
+        justify-content: space-between;   
+        flex-direction: row; 
+        align-items: center;
+        padding: 0px;
+        width: 100%;
+        height: 70px;   
+        text-align: center;    
+        background-color: #00d1b2;
+        z-index :99999
+        } 
+        
+        .title_name{
+          font-size:30px;
+          padding-left:30px;
+          color:white;
+        }
+
+        .body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .nav {
+            width:100%;
+            height:200px;
+            background-color: #00d1b2;
+            z-index :99998
+        }
         .wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             width: 80%;
             min-width: 500px;
             max-width: 800px;
-            margin: 0 auto;
+            margin: 200px auto 30px auto;
+            height: 100%;
         }
 
         .div1 {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            margin: 1em 0 4em 0;
-            font-size: 0.8rem;
+            display:flex;   
+            flex-direction: row;        
+            text-align: center;    
+            align-items: center; 
+            margin:20px 10px 0px 10px;
         }
 
         #user_nickname {
@@ -112,6 +147,39 @@
         .buttons {
             display: flex;
             justify-content: flex-end;
+            transition: all 0.3s ease 0s;
+        }
+        .btn {
+            width: 100px;
+            height:40px;
+            border:none;
+            border-radius:10px;
+            background-color:#00d1b2;
+            transition: all 0.6s ease 0s;
+            font-weight:bold;
+            color: white;
+            margin-left:10px;
+        }
+        .write_btn:hover {
+            cursor:pointer;
+            transform: translateY(-5px);
+        }
+        .btns{
+            transition: all 0.3s ease 0s;
+            cursor:pointer;
+            font-size:15px;
+            margin-left:10px;
+            text-align: center;
+            width: 80px;
+            height: 30px;
+        }
+        .btns:hover{            
+            color: white;
+            border:none;
+            width: 85px;
+            font-size:16px;
+            transform: translateY(-2px);
+            font-weight:bold;
         }
 
         button:hover {
@@ -167,6 +235,7 @@
                     data: form_data,
                     success: function (response) {
                         if (response["result"] == "success") {
+                            alert("질문이 등록되었습니다.");
                             window.location.reload();
                             location.replace("/");
                             //main page move
@@ -195,6 +264,7 @@
                     data: form_data,
                     success: function (response) {
                         if (response["result"] == "success") {
+                            alert("질문등록!!");
                             window.location.reload();
                             location.replace("/");
                             //main page move
@@ -261,21 +331,21 @@
     </script>
 </head>
 <body>
-<header class="hero is-primary">
-    <div class="hero-body wrapper">
-        <p class="title">
-            지식 in OverFlow
-        </p>
-    </div>
-</header>
 
+<div class="header">
+    <p style="color:#00d1b2;">지식IN overflow</p>     
+    <p class="title_name" style="margin-top:10px"> <img src="./static/image/file_w.png" width="50px" align="center" alt="My Image" style="margin:0px 5px 8px 0px">
+        지식IN overflow
+    </p>          
+    <div class = "div1">            
+        <!--<p class="user_nickname"><span id="user_nickname" style="font-weight:bold;">{{userNickname}}</span> 님 환영합니다</p>-->
+        <p class="btns mypage_btn" onclick="toMypage()">마이페이지</p>
+        <p class="btns logout_btn" onclick="toLogout()">로그아웃</p>
+    </div>      
+</div>
+
+<div class ="body">
 <div class="wrapper">
-    <div class="div1">
-        <p class="user_nickname"><span id="user_id">{{ user_id }}</span> 님</p>
-        <button type="button" class="mypageBtn button is-primary" onclick="toMypage()">마이페이지</button>
-        <button type="button" class="logoutBtn button is-primary" onclick="toLogout()">로그아웃</button>
-    </div>
-
     <section class="write-form">
         <div class="title-input">
             <span>Title</span>
@@ -311,11 +381,11 @@
         </div>
 
         <div class="buttons">
-            <button id="button" onclick="posting()" class="button is-primary">질문 등록</button>
-            <button id="button" onclick="cancel()" class="button is-primary">작성 취소</button>
+            <button id="button" onclick="posting()" class="btn posting_btn">질문 등록</button>
+            <button id="button" onclick="cancel()" class="btn cancle_btn">작성 취소</button>
         </div>
     </section>
 </div>
-
+</div>
 </body>
 </html>
