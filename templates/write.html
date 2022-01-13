@@ -208,7 +208,7 @@
 
         function posting() {
 
-            let id = $('#user_id').text();
+            let id = $('#user_id').val();
             let title = $('#title').val();
             let title_check = title.trim();
             if(title_check == null || title_check == "") {
@@ -316,7 +316,8 @@
     <p class="title_name" style="margin-top:10px"> <img src="./static/image/file_w.png" width="50px" align="center" alt="My Image" style="margin:0px 5px 8px 0px">
         지식IN overflow
     </p>          
-    <div class = "div1">            
+    <div class = "div1">
+        <input id="user_id" type="hidden" value="{{ user_id }}">
         <!--<p class="user_nickname"><span id="user_nickname" style="font-weight:bold;">{{userNickname}}</span> 님 환영합니다</p>-->
         <p class="btns mypage_btn" onclick="toMypage()">마이페이지</p>
         <p class="btns logout_btn" onclick="toLogout()">로그아웃</p>
