@@ -260,9 +260,23 @@
             border-radius: 5px;
         }
 
+        .like-count {
+            position: absolute;
+            right: 1em;
+            bottom: 0.5em;
+            font-size: 1rem;
+        }
+
     </style>
 
     <script>
+
+        $(document).ready(function () {
+
+            $('#read_reply').css('display', 'flex')
+            $('#modify_reply').css('display', 'none')
+
+        });
 
         function outArticle() {
 
@@ -394,6 +408,63 @@
 
         }
 
+        function deleteReply(id) {
+            confirm('정말 삭제하시겠습니까?')
+
+            $.ajax({
+                type: "POST",
+                url: "/api/deleteReply",
+                data: {reply_id_give: id},
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
+                    fnMove(article_id)
+
+                }
+            })
+
+        }
+
+        function modifyReply(id) {
+            $('#modify_reply' + id).show()
+            $('#read_reply' + id).hide()
+            $('#modify_' + id).hide()
+            $('#delete_' + id).hide()
+            var temp = 'modify_reply' + id
+            fnMove(temp)
+        }
+
+        function init_hide(id) {
+            $('#' + id).hide()
+        }
+
+        function goModifyReply(id) {
+
+            modify_value = $('#modify_value_reply' + id).val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/modifyReply",
+                data: {
+                    reply_id_give: id,
+                    modify_value: modify_value
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
+                    fnMove(article_id)
+
+                }
+            })
+        }
+
+        function cancelModify(id) {
+            $('#modify_reply' + id).hide()
+            $('#read_reply' + id).show()
+            $('#modify_' + id).show()
+            $('#delete_' + id).show()
+        }
+
     </script>
 </head>
 <body>
@@ -459,6 +530,12 @@
                         </div>
                         <div class="col">
                             <div class="like-count">
+                                {% if user_id == item.user_id %}
+                                    <a id="modify_{{ item._id }}" href="#a" style="color:blue"
+                                       onclick="modifyReply('{{ item._id }}')">수정</a>
+                                    <a id="delete_{{ item._id }}" href="#a" style="color:red"
+                                       onclick="deleteReply('{{ item._id }}')">삭제</a>
+                                {% endif %}
                                 <button onclick="goLike('{{ item._id }}', true)">
                                     <i class="far fa-thumbs-up"></i>
                                 </button>

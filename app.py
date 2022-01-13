@@ -246,14 +246,15 @@ def read():
         reply_like_list = []
 
         # 댓글들의 좋아요 명단 가져오기
-        for item in reply_on_article:
-            like_list = item['good_bad']
-            print("list : " + str(like_list))
-            if user_id in like_list:
-                user_checker = True
-            else:
-                user_checker = False
-            reply_like_list.append(user_checker)
+        if reply_on_article != '':
+            for item in reply_on_article:
+                like_list = item['good_bad']
+                print("list : " + str(like_list))
+                if user_id in like_list:
+                    user_checker = True
+                else:
+                    user_checker = False
+                reply_like_list.append(user_checker)
 
         for i in range(len(reply_on_article)):
             reply_on_article[i]['like_checker'] = reply_like_list[i]
