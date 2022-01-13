@@ -11,6 +11,11 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <!-- Fontawesome Icon -->
+    <script src="https://kit.fontawesome.com/c5929fafa9.js" crossorigin="anonymous"></script>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -28,225 +33,102 @@
 
     <style>
         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Jua', sans-serif;
         }
 
-        /* header 스타일 */
-        .header {
-            position: fixed;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0px 10px 0px 10px;
-            width: 100%;
-            height: 20px;
-            text-align: center;
-            font-size: 6px;
-            color: white;
-            background-color: #364f6b;
+        input:focus, textarea:focus {
+            outline: none;
         }
-
-        a:visited {
-            color: white;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: white;
-            text-decoration: none;
-        }
-
-        .user_id {
-            text-align: center;
-            margin: 5px;
-        }
-
 
         /* body 스타일 */
-        .body {
-            display: flex;
-            justify-content: center;
+        body {
+            width: 100%;
         }
 
-        /* 내용부분body */
-        .wrap {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 800px;
-            padding: 30px;
+        .wrapper {
+            width: 80%;
+            min-width: 500px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .article {
+        .div1 {
             display: flex;
-            flex-direction: row;
-            justify-content: center;
-            margin-top: 50px;
+            align-items: center;
+            justify-content: flex-end;
+            margin: 1em 0 4em 0;
+            font-size: 0.8rem;
         }
 
-        #span_tag {
-            display: block;
-            width: 60px;
-            font-size: 25px;
-            margin-right: 5px;
+        #user_nickname {
+            font-size: 1rem;
             font-weight: bold;
         }
 
-        .ipbox_question {
-            width: 100%;
-            padding-left: 10px;
+        .div1 .mypageBtn {
+            margin: 0 0.3em 0 1em;
         }
 
-        .main_body {
+        .write-form {
+            width: 100%;
+        }
+
+        .title-input {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-top: 40px;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 1em;
         }
 
-        .textarea_contents {
+        .title-input span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 0.8em;
+        }
+
+        #title {
             width: 100%;
-            height: 500px;
-            padding: 10px;
+            font-size: 1.1rem;
+            padding: 0.3em;
+            border-radius: 4px;
+            border: 0.5px solid lightgrey;
+        }
+
+        textarea {
             resize: none;
-            overflow-y: scroll;
+            width: 100%;
+            height: 32vh;
+            overflow: auto;
+            margin-bottom: 1em;
+            border-radius: 4px;
+            border: 0.5px solid lightgrey;
+            font-size: 1rem;
+            padding: 0.5em;
         }
 
         .buttons {
             display: flex;
-            margin-top: 20px;
             justify-content: flex-end;
         }
 
-        #button {
-            background-color: #364f6b;
-            color: white;
-            width: 120px; /* 크기지정 */
-            height: 36px;
-            transition: all 0.3s ease 0s;
-            border: 1px solid #364f6b;
-            border-radius: 5px;
-            margin-left: 15px;
-
-        }
-
-        #button:hover {
-            background-color: #263649;
-            color: white;
+        button:hover {
             border: none;
-            transform: translateY(-5px);
+            transform: translateY(-0.2em);
         }
 
-        * {
-            font-family: 'Jua', sans-serif;
-        }
-
-        /* header 스타일 */
-        .header {
-            position: fixed;
+        .img-form {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0px 10px 0px 10px;
-            width: 100%;
-            height: 20px;
-            text-align: center;
-            font-size: 6px;
-            color: white;
-            background-color: #364f6b;
+            margin-bottom: 1em;
         }
 
-        a:visited {
-            color: white;
-            text-decoration: none;
-        }
-
-        a:hover {
-            color: white;
-            text-decoration: none;
-        }
-
-        .user_id {
-            text-align: center;
-            margin: 5px;
-        }
-
-
-        /* body 스타일 */
-        .body {
-            display: flex;
-            justify-content: center;
-        }
-
-        /* 내용부분body */
-        .wrap {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 800px;
-            padding: 30px;
-        }
-
-        .article {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            margin-top: 50px;
-        }
-
-        #span_tag {
+        #preview {
             display: block;
-            width: 60px;
-            font-size: 25px;
-            margin-right: 5px;
-            font-weight: bold;
+            width: 50%;
+            margin-left: 0.5em;
         }
-
-        .ipbox_question {
-            width: 100%;
-            padding-left: 10px;
-        }
-
-        .main_body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
-        .textarea_contents {
-            width: 100%;
-            height: 500px;
-            padding: 10px;
-            resize: none;
-            overflow-y: scroll;
-        }
-
-        .buttons {
-            display: flex;
-            margin-top: 20px;
-            justify-content: flex-end;
-        }
-
-        #button {
-            background-color: #364f6b;
-            color: white;
-            width: 120px; /* 크기지정 */
-            height: 36px;
-            transition: all 0.3s ease 0s;
-            border: 1px solid #364f6b;
-            border-radius: 5px;
-            margin-left: 15px;
-
-        }
-
-        #button:hover {
-            background-color: #263649;
-            color: white;
-            border: none;
-            transform: translateY(-5px);
-        }
-
     </style>
 
     <script>
@@ -265,8 +147,8 @@
             if (image_checker) {
                 let fileInput = document.getElementsByClassName("file");
 
-                let filename = fileInput[0].files[0].name
                 let file = $('#file')[0].files[0]
+                let filename = file['name']
 
                 let form_data = new FormData()
 
@@ -368,41 +250,72 @@
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
+                    document.querySelector('.file-name').textContent = input.files[0].name;
                     document.getElementById('preview').src = e.target.result;
+                    $('#preview').toggleClass('is-hidden')
                 };
                 reader.readAsDataURL(input.files[0]);
-
-                image_checker = true
             }
         }
 
     </script>
 </head>
 <body>
-<div class="header">
-    <a href="">지식 in OverFlow</a>
-    <p class="user_id"><span id="user_id">{{ user_id }}</span>님</p>
-</div>
-
-<div class="body">
-    <div class="wrap">
-        <div class="article">
-            <span id="span_tag">질문</span><input class="ipbox_question" id="title" placeholder="제목을 입력하세요.">
-        </div>
-        <div class="main_body">
-            <textarea class="textarea_contents" id="contents" placeholder="궁금한 내용을 입력해 주세요."></textarea>
-        </div>
-
-        <div class="imgshape">
-            <img id="preview" class="cardimg"></img>
-            <input class="chooseFile file" type="file" id="file" accept="image/*" onchange="loadFile(this)">
-            <div class="findbtn">
-                <label for="file"><b>이미지 찾기</b></label>
-                <button id="button" onclick="posting()">질문 등록</button>
-                <button id="button" onclick="cancel()">작성 취소</button>
-            </div>
-        </div>
+<header class="hero is-primary">
+    <div class="hero-body wrapper">
+        <p class="title">
+            지식 in OverFlow
+        </p>
     </div>
+</header>
+
+<div class="wrapper">
+    <div class="div1">
+        <p class="user_nickname"><span id="user_nickname">{{ user_id }}</span> 님</p>
+        <button type="button" class="mypageBtn button is-primary" onclick="toMypage()">마이페이지</button>
+        <button type="button" class="logoutBtn button is-primary" onclick="toLogout()">로그아웃</button>
+    </div>
+
+    <section class="write-form">
+        <div class="title-input">
+            <span>Title</span>
+            <input id="title" class="question" type="text" placeholder="질문을 입력해주세요.">
+        </div>
+        <textarea id="contents" placeholder="궁금한 내용을 입력해주세요."></textarea>
+
+        <!--    <div class="imgshape">
+                <img id="preview" class="cardimg"/>
+                <input class="chooseFile file" type="file" id="file" accept="image/*" onchange="loadFile(this)">
+                            <input class="chooseFile file" type="file" id="file">
+                <div class="findbtn">
+                    <label for="file"><b>이미지 찾기</b></label>
+                </div>
+            </div> -->
+
+        <div class="file has-name is-fullwidth img-form">
+
+            <label class="file-label">
+                <input class="chooseFile file file-input" type="file" id="file" accept="image/*"
+                       onchange="loadFile(this)">
+                <span class="file-cta">
+                  <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                  </span>
+                  <span class="file-label">
+                    이미지 찾기
+                  </span>
+                </span>
+                <span class="file-name"></span>
+            </label>
+            <img id="preview" class="cardimg is-hidden"/>
+        </div>
+
+        <div class="buttons">
+            <button id="button" onclick="posting()" class="button is-primary">질문 등록</button>
+            <button id="button" onclick="cancel()" class="button is-primary">작성 취소</button>
+        </div>
+    </section>
 </div>
+
 </body>
 </html>

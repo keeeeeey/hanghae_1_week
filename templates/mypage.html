@@ -16,8 +16,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
     <style>
+        .header{ 
+        position: fixed;
+        display: flex;     
+        justify-content: space-between;    
+        align-items: center;
+        padding: 0px;
+        width: 100%;
+        height: 100px;   
+        text-align: center; 
+        font-size: 6px;    
+        color: white; 
+        background-color: #00d1b2;
+        z-index :99999
+        } 
+         
+        .title_name{
+          font-size:27px;
+          padding-left:50px;
+          color:white;
+        }
+        
         .section {
-            width: 600px;
+            width: 600px;            
             margin: 0 auto;
             padding-top: 100px;
         }
@@ -144,130 +165,128 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
-<section class="hero is-primary is-bold" style="height: 150px; padding-top: 10px;">
-    <div class="hero-body">
-        <div class="container">
-            <h1 class="title">
-                지식 in stackoverflow
-            </h1>
 
-        </div>
+    <div class = "header">
+      <p class="title_name">지식IN overflow <span style="font-size:50px">Sign up</span></p>    
+      <img src="./static/image/file_w.png" width="250px" alt="My Image" style="margin:0px 5px 8px 0px">
     </div>
-</section>
-<div class="section has-text-centered">
-    <h1 class="title" style="margin-left: 50px;">마이 페이지</h1>
-    <div class="container" style="width:100%">
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userid">ID</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="mypageid" aria-describedby="emailHelp"
-                               value="{{ userId.id }}" readonly>
+
+<div class = "wrap">
+    <div class="section has-text-centered">
+        <h1 class="title" style="margin-left: 50px;">마이 페이지</h1>
+        <div class="container" style="width:100%">
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="userid">ID</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="text" class="input" id="mypageid" aria-describedby="emailHelp"
+                                   value="{{ userId.id }}" readonly>
+                        </div>
+                        <div id="messageID" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageID" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="mypagepw">PW</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="password" class="input" id="mypagepw" placeholder="My Password"
-                               onblur="mypagePwValidation()">
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="mypagepw">PW</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="password" class="input" id="mypagepw" placeholder="My Password"
+                                   onblur="mypagePwValidation()">
+                        </div>
+                        <div id="messageMypagePW" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageMypagePW" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="mypagepw2">PW Check</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="password" class="input" id="mypagepw2" placeholder="My Password Check"
-                               onblur="mypagePwCheck()">
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="mypagepw2">PW Check</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="password" class="input" id="mypagepw2" placeholder="My Password Check"
+                                   onblur="mypagePwCheck()">
+                        </div>
+                        <div id="messageMypagePW2" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageMypagePW2" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="usernickname">NICKNAME</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="usernickname" value="{{ userId.nickname }}" readonly>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="usernickname">NICKNAME</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="text" class="input" id="usernickname" value="{{ userId.nickname }}" readonly>
+                        </div>
+                        <div id="messageNickName" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageNickName" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="userEmail">EMAIL</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="userEmail" value="{{ userId.email }}" readonly>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="userEmail">EMAIL</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="text" class="input" id="userEmail" value="{{ userId.email }}" readonly>
+                        </div>
+                        <div id="messageEmail" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageEmail" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="mypageZipcode">ZIPCODE</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control" style="display: flex;">
-                        <input type="text" class="input" id="mypageZipcode" placeholder="My Address" value="{{ userId.zipcode }}" readonly>
-                        <button class="button is-primary" style="margin-left: 10px;" onclick="findAddress2()">주소 찾기
-                        </button>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="mypageZipcode">ZIPCODE</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control" style="display: flex;">
+                            <input type="text" class="input" id="mypageZipcode" placeholder="My Address" value="{{ userId.zipcode }}" readonly>
+                            <button class="button is-primary" style="margin-left: 10px;" onclick="findAddress2()">주소 찾기
+                            </button>
+                        </div>
+                        <div id="messageZipcode" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageZipcode" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="mypageAddress">ADDRESS</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="mypageAddress" placeholder="My Address" value="{{ userId.address }}" readonly>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="mypageAddress">ADDRESS</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="text" class="input" id="mypageAddress" placeholder="My Address" value="{{ userId.address }}" readonly>
+                        </div>
+                        <div style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
-        </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label" for="mypageDetailAddress">DETAIL</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input type="text" class="input" id="mypageDetailAddress" placeholder="My Detail Address" value="{{ userId.detail }}"
-                               onblur="detailAddressCheck()">
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label" for="mypageDetailAddress">DETAIL</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input type="text" class="input" id="mypageDetailAddress" placeholder="My Detail Address" value="{{ userId.detail }}"
+                                   onblur="detailAddressCheck()">
+                        </div>
+                        <div id="messageMypageDetailAddress" style="height: 20px; text-align: left;"></div>
                     </div>
-                    <div id="messageMypageDetailAddress" style="height: 20px; text-align: left;"></div>
                 </div>
             </div>
+            <button class="button is-primary" onclick="updateInfo()" style="margin-left: 50px;">회원정보 수정</button>
         </div>
-        <button class="button is-primary" onclick="updateInfo()" style="margin-left: 50px;">회원정보 수정</button>
     </div>
 </div>
 </body>
