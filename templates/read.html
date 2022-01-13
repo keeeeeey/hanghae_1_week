@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지식 in overflow Write_page</title>
 
     <!--Google Font Import-->
@@ -29,6 +28,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <style>
         * {
@@ -141,47 +143,6 @@
             transform: translateY(-5px);
         }
 
-        .arrow-up {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-up::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(315deg); /* 각도 */
-        }
-
-        .arrow-down {
-            margin: 10px;
-            position: relative;
-        }
-
-        .arrow-down::after {
-            position: absolute;
-            left: 0;
-            top: 0;
-            content: '';
-            width: 20px; /* 사이즈 */
-            height: 20px; /* 사이즈 */
-            border-top: 3px solid #000; /* 선 두께 */
-            border-right: 3px solid #000; /* 선 두께 */
-            transform: rotate(135deg); /* 각도 */
-        }
-
-        .like_value {
-
-            font-size: 20px;
-            margin: auto;
-
-        }
-
         .reply {
 
             margin-top: 20px;
@@ -192,6 +153,14 @@
 
             margin-top: 20px;
 
+        }
+
+
+        .like-count {
+            position: absolute;
+            right: 1em;
+            bottom: 0.5em;
+            font-size: 1rem;
         }
 
         button {
@@ -237,7 +206,6 @@
         }
 
         function goLike(reply_id, checker) {
-            console.log('goLike: reply_id : ' + reply_id)
 
             $.ajax({
                 type: "POST",
@@ -249,15 +217,7 @@
                 success: function (response) {
                     if (response["result"] == "success") {
                         window.location.reload();
-                        console.log('after response checker : ' + checker)
 
-                        if (checker) {
-                            change_color("gray_green", "arrow_down")
-                            change_color("black", "arrow_up")
-                        } else {
-                            change_color("gray_green", "arrow_up")
-                            change_color("black", "arrow_down")
-                        }
                     }
                 }
             })
@@ -304,21 +264,80 @@
             console.log(id);
             let title = $('#input-title').val();
             let content = $('#textarea-content').val();
-             $.ajax({
+            $.ajax({
                 type: "POST",
                 url: "/api/update",
                 data: {
-                        id_give: id,
-                        title_give: title,
-                        content_give: content
-                        },
+                    id_give: id,
+                    title_give: title,
+                    content_give: content
+                },
                 success: function (response) {
                     alert("success")
                     window.location.replace('/')
-                    }
+                }
             })
         }
 
+        function init_hide(id) {
+            $('#' + id).hide()
+        }
+
+        function goModifyReply(id) {
+
+            modify_value = $('#modify_value_reply' + id).val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/modifyReply",
+                data: {
+                    reply_id_give: id,
+                    modify_value: modify_value
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    window.location.reload();
+                    fnMove(article_id)
+
+                }
+            })
+        }
+
+        function cancelModify(id) {
+            $('#modify_reply' + id).hide()
+            $('#read_reply' + id).show()
+            $('#modify_' + id).show()
+            $('#delete_' + id).show()
+        }
+
+        function modifyReply(id) {
+            $('#modify_reply' + id).show()
+            $('#read_reply' + id).hide()
+            $('#modify_' + id).hide()
+            $('#delete_' + id).hide()
+            var temp = 'modify_reply' + id
+            fnMove(temp)
+        }
+
+        function deleteReply(id) {
+
+            if (confirm("정말 삭제하시겠습니까?") == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/deleteReply",
+                    data: {reply_id_give: id},
+                    success: function (response) {
+                        alert(response['msg'])
+                        window.location.reload();
+                        fnMove(article_id)
+
+                    }
+                })
+            } else {
+                return;
+            }
+
+        }
     </script>
 </head>
 <body>
@@ -363,33 +382,55 @@
 
                     <div class="row card">
                         <div class="col-9">
-                            <div class="card-content reply-item">
-                                <p>{{ item.reply_data }}</p>
+                            <div class="card-content">
+
+                                <p id="read_reply{{ item._id }}">{{ item.reply_data }}</p>
+
+                                <div id="modify_reply{{ item._id }}">
+                                    <textarea cols="80" rows="20" id="modify_value_reply{{ item._id }}"
+                                              type="text">{{ item.reply_data }}</textarea>
+                                    <input type="button" value="수정하기" onclick="goModifyReply('{{ item._id }}')">
+                                    <input type="button" value="취소" onclick="cancelModify('{{ item._id }}')">
+                                </div>
+                                <td>
+                                    <script>init_hide("modify_reply" + '{{ item._id }}')</script>
+                                </td>
                             </div>
                         </div>
                         <div class="col">
                             <div class="like-count">
-                                <button onclick="goLike('{{ item._id }}', true)">
-                                    <i class="far fa-thumbs-up"></i>
+                                {% if user_id == item.user_id %}
+                                    <a id="modify_{{ item._id }}" href="#a" style="color:blue"
+                                       onclick="modifyReply('{{ item._id }}')">수정</a>
+                                    <a id="delete_{{ item._id }}" href="#a" style="color:red"
+                                       onclick="deleteReply('{{ item._id }}')">삭제</a>
+                                {% endif %}
+                                <button>
+
+                                    {% if item.like_checker==true %}
+                                        <i id="like_filled" class="fa fa-thumbs-up"
+                                           onclick="goLike('{{ item._id }}', false)"></i>
+                                    {% else %}
+                                        <i id="like_empty" class="far fa-thumbs-up"
+                                           onclick="goLike('{{ item._id }}', true)"></i>
+                                    {% endif %}
+
                                 </button>
                                 <span class="reply-count">{{ item.good }}</span>
-                                <button onclick="goLike('{{ item._id }}', false)">
-                                    <i class="far fa-thumbs-down"></i>
-                                </button>
+
                             </div>
                         </div>
                     </div>
-
                 {% endfor %}
             {% endif %}
 
             <div id="pagination" style="display: flex; justify-content: right;">
                 <!-- 페이지네이션을 위한 코드 시작 -->
                 {% if block_start - 1 > 0 %}
-                    <a href="{{url_for('read', page=block_start - 1)}}">[이전]</a>
+                    <a href="{{ url_for('read', page=block_start - 1) }}">[이전]</a>
                 {% endif %}
 
-                {% for i in range(block_start, block_end + 1)%}
+                {% for i in range(block_start, block_end + 1) %}
                     <!-- 데이터가 존재하지 않는 페이지는 화면에 나타내지 않기 위한 조건문 -->
                     {% if i > last_page_num %}
 
@@ -397,13 +438,14 @@
                         {% if i == page %}
                             <div class="page-link" style="margin-left: 5px;"><b>{{ i }}</b></div>
                         {% else %}
-                            <a class="page-link" style="margin-left: 5px;" href="{{url_for('read', page=i, article_id=target_article._id)}}">{{ i }}</a>
+                            <a class="page-link" style="margin-left: 5px;"
+                               href="{{ url_for('read', page=i, article_id=target_article._id) }}">{{ i }}</a>
                         {% endif %}
                     {% endif %}
                 {% endfor %}
 
                 {% if block_end < last_page_num %}
-                    <a href="{{url_for('read', page=block_end + 1)}}">[다음]</a>
+                    <a href="{{ url_for('read', page=block_end + 1) }}">[다음]</a>
                 {% endif %}
                 <!-- 페이지네이션을 위한 코드 끝 -->
             </div>
@@ -412,37 +454,40 @@
 
     </div>
 </div>
-    <!-- 게시물 수정 모달 폼-->
-    <div class="modal" id="modal-edit">
-        <!--background 활성화-->
-        <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
-        <!--contents 활성화-->
-        <div class="modal-content">
-            <div class="box">
-                <article class="media">
-                    <div class="media-content">
-                        <div class="field">
-                            <label class="label" for="input-name">Title</label>
-                            <p class="control">
-                                <input id="input-title" class="input"placeholder="수정 할 title을 입력해 주세요." value="{{ target_article.title }}">
-                            </p>
-                        </div>
-                        <div class="field">
-                            <label class="label" for="textarea-about">Contents</label>
-                            <p class="control">
-                            <textarea id="textarea-content" class="textarea" placeholder="수정 할 글을 입력해 주세요.">{{ target_article.contents }}</textarea>
-                            </p>
-                        </div>
-                        <div class="buttons">
-                            <button id="button" onclick="update_posting()">질문 등록</button>
-                            <button id="button" onclick='$("#modal-edit").removeClass("is-active")'>작성 취소</button>
-                        </div>
+<!-- 게시물 수정 모달 폼-->
+<div class="modal" id="modal-edit">
+    <!--background 활성화-->
+    <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
+    <!--contents 활성화-->
+    <div class="modal-content">
+        <div class="box">
+            <article class="media">
+                <div class="media-content">
+                    <div class="field">
+                        <label class="label" for="input-name">Title</label>
+                        <p class="control">
+                            <input id="input-title" class="input" placeholder="수정 할 title을 입력해 주세요."
+                                   value="{{ target_article.title }}">
+                        </p>
                     </div>
-                </article>
-            </div>
+                    <div class="field">
+                        <label class="label" for="textarea-about">Contents</label>
+                        <p class="control">
+                            <textarea id="textarea-content" class="textarea"
+                                      placeholder="수정 할 글을 입력해 주세요.">{{ target_article.contents }}</textarea>
+                        </p>
+                    </div>
+                    <div class="buttons">
+                        <button id="button" onclick="update_posting()">질문 등록</button>
+                        <button id="button" onclick='$("#modal-edit").removeClass("is-active")'>작성 취소</button>
+                    </div>
+                </div>
+            </article>
         </div>
-        <button class="modal-close is-large" aria-label="close" onclick='$("#modal-edit").removeClass("is-active")'></button>
     </div>
+    <button class="modal-close is-large" aria-label="close"
+            onclick='$("#modal-edit").removeClass("is-active")'></button>
+</div>
 
 </body>
 </html>
