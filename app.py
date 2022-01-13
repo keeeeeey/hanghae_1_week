@@ -1,5 +1,4 @@
 import math
-
 from contextlib import nullcontext
 from bson import ObjectId, objectid
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
@@ -21,6 +20,9 @@ SECRET_KEY = 'SPARTA'
 @app.route('/')
 def homework():
     print("home start")
+
+    sortingType = request.args.get("sortingType")
+    print(sortingType)
 
     # 페이지 값 (디폴트값 = 1)
     page = request.args.get("page", 1, type=int)
@@ -44,7 +46,11 @@ def homework():
     # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
     block_end = block_start + (block_size - 1)
 
-    question_list = list(db.article.find({}).skip((page - 1) * limit).limit(limit))
+    question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
+    if sortingType == "hits":
+        question_list = list(db.article.find({}).sort("count",-1).skip((page - 1) * limit).limit(limit))
+    else:
+        question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
     id_list = []
 
     #id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
@@ -100,7 +106,6 @@ def write():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-
 ## 로그인 화면 보여주기
 @app.route('/login')
 def login():
@@ -148,12 +153,39 @@ def toMypage():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
+## 회원정보 수정
+@app.route('/api/updateMember', methods=['POST'])
+def updateMember():
+    user_pw = request.form['pw_give']
+    user_zipcode = request.form['zipcode_give']
+    user_address = request.form['address_give']
+    user_detail = request.form['detail_give']
+
+    pw_hash = hashlib.sha256(user_pw.encode('utf-8')).hexdigest()
+
+    # jwt token 받아오기
+    token_receive = request.cookies.get('mytoken')
+
+    if token_receive is None:
+        print("비로그인 to read")
+        return render_template('login.html')
+    else:
+        print("로그인 to read")
+        try:
+            payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+            db.user.update_many({'id': payload['id']}, {'$set': {'password': pw_hash, 'zipcode': user_zipcode, 'address': user_address, 'detail': user_detail}})
+
+            return jsonify({'result': 'success'})
+        except jwt.ExpiredSignatureError:
+            return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+        except jwt.exceptions.DecodeError:
+            return redirect(url_for("login"))
+
 ## read 화면 보여주기
 @app.route('/api/read')
 def read():
 
     article_id = request.args.get('article_id')
-
     # jwt token 받아오기
     token_receive = request.cookies.get('mytoken')
 
@@ -168,7 +200,9 @@ def read():
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_id = db.user.find_one({"id": payload['id']})['id']
 
-                        # 페이지 값 (디폴트값 = 1)
+
+            # 페이지 값 (디폴트값 = 1)
+
             page = request.args.get("page", 1, type=int)
             # 한 페이지 당 몇 개의 게시물을 출력할 것인가
             limit = 10
@@ -218,13 +252,13 @@ def read():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-
 @app.route('/api/posting', methods=['POST'])
 def write_post():
     id_receive = request.form['id_give']
     title_receive = request.form['title_give']
+
     content_receive = request.form['content_give'] 
-    count = 0  
+    count = 0
 
     doc = {
         'user_id': id_receive,
@@ -248,7 +282,6 @@ def delete_article():
     articleID_receive = request.form['articleID_give']
     db.article.delete_one({'_id': ObjectId(articleID_receive)})
     return jsonify({'result': 'success', 'msg': '삭제되었습니다'})
-
 
 ## 로그인 API
 @app.route('/api/login', methods=['POST'])
@@ -285,9 +318,6 @@ def nicknameCheck():
     nickname_receive = request.form['nickname_give']
     exists = bool(db.user.find_one({"nickname": nickname_receive}))
     return jsonify({'result': 'success', 'exists': exists})
-
-
-
 
 ## 회원가입
 @app.route('/api/register', methods=['POST'])
@@ -371,7 +401,6 @@ def add_reply():
 
     return jsonify({'result': 'success', 'msg': '질문 등록 완료!!'})
 
-
 ## 수정
 @app.route('/api/update', methods=['POST'])
 def update_posting():
@@ -387,4 +416,4 @@ def update_posting():
     return jsonify({'result': 'success'})      
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=8000, debug=True)

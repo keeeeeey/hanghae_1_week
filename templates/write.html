@@ -135,10 +135,12 @@
             let id = $('#user_id').text();
             let title = $('#title').val();
             let content = $('#contents').val();
+
             //let form_data = new FormData()
             
             //form_data.append("title_give", title)
             //form_data.append("content_give", content) 
+
             $.ajax({
                 type: "POST",
                 url: "/api/posting",
@@ -171,7 +173,7 @@
 <body>
     <div class = "header">
         <a href="">지식 in OverFlow</a>
-       <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>
+        <p class="user_id"><span id="user_id">{{user_id}}</span>님</p>
     </div>
 
     <div class="body">  

@@ -30,10 +30,9 @@
         position: relative;
       }*/
 
-      .header{ 
-         position: fixed;
+      .header{          
          display: flex;     
-         justify-content: flex-start;    
+         justify-content: space-between;    
          align-items: center;
          padding: 0px;
          width: 100%;
@@ -44,12 +43,11 @@
          background-color: #00d1b2;
       }  
       .title_name{
-        font-size:35px;
+        font-size:27px;
         padding-left:50px;
         color:white;
       }
-      .hero-body{
-        
+      .hero-body{        
         padding: 0px;
       }
       /* body 스타일 */
@@ -73,11 +71,23 @@
         align-items: center;
         padding: 50px;
         max-width: 350px;
-        width: 60%;
+        width: 80%;
+      }
+      .input{
+        width:100%;
       }
       .button {
         width: 100px;
       }
+      button{   
+       transition: all 0.3s ease 0s;
+      }
+       button:hover{
+       background-color: #0f8a77;
+       color: white;
+       border:none;
+       transform: translateY(-5px);
+      } 
 
       .btn-container {
         width: 100%;
@@ -89,7 +99,8 @@
 
   <body>
     <div class = "header">
-      <p class="title_name">지식IN overflow</p>      
+      <p class="title_name">지식IN overflow  <span style="font-size:50px">Login</span></p>   
+      <img src="./static/image/file_w.png" width="250px" alt="My Image" style="margin:0px 5px 8px 0px">   
     </div>
 
     <div class = "body">
