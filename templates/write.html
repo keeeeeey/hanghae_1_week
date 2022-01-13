@@ -210,6 +210,11 @@
 
             let id = $('#user_id').text();
             let title = $('#title').val();
+            let title_check = title.trim();
+            if(title_check == null || title_check == "") {
+                alert('title 을 입력하세요!')
+                return;
+            }
             let content = $('#contents').val();
 
             if (image_checker) {

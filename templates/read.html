@@ -267,7 +267,30 @@
             bottom: 0.5em;
             font-size: 1rem;
         }
-
+        .row.card{ 
+            display:flex;
+            justify-content:center;
+            flex-direction:column;
+        }
+        .card-content{ 
+            display:flex;            
+            width:600px;
+        }
+        .col-9 {
+            display:flex;
+            justify-content:center;
+            flex-direction:column;
+        }
+        .modify_btns {
+            display:flex;
+            justify-content:flex-end;
+            flex-direction:row;
+        }
+        .cancle_btn{
+            margin-left: 10px;
+            color: white;
+            background-color:green;
+        }        
     </style>
 
     <script>
@@ -434,6 +457,8 @@
             $('#read_reply' + id).hide()
             $('#modify_' + id).hide()
             $('#delete_' + id).hide()
+
+        
             var temp = 'modify_reply' + id
             fnMove(temp)
         }
@@ -467,6 +492,7 @@
             $('#read_reply' + id).show()
             $('#modify_' + id).show()
             $('#delete_' + id).show()
+
         }
 
     </script>
@@ -531,11 +557,13 @@
                             <div class="card-content">
                                 <p id="read_reply{{ item._id }}">{{ item.reply_data }}</p>
 
-                                <div id="modify_reply{{ item._id }}">
+                                <div class= "reply_buttons" id="modify_reply{{ item._id }}">
                                     <textarea cols="80" rows="20" id="modify_value_reply{{ item._id }}"
                                               type="text">{{ item.reply_data }}</textarea>
-                                    <input type="button" value="수정하기" onclick="goModifyReply('{{ item._id }}')">
-                                    <input type="button" value="취소" onclick="cancelModify('{{ item._id }}')">
+                                    <div class="modify_btns">          
+                                        <input type="button" id="btn modify_btn" value="수정" onclick="goModifyReply('{{ item._id }}')">
+                                        <input type="button" id="btn cancle_btn" value="취소" onclick="cancelModify('{{ item._id }}')">
+                                    </div>
                                 </div>
                                 <td>
                                     <script>init_hide("modify_reply" + '{{ item._id }}')</script>
