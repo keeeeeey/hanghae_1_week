@@ -15,11 +15,13 @@ db = client.dbhanghae
 
 SECRET_KEY = 'SPARTA'
 
-
 ## HTML 화면 보여주기
 @app.route('/')
 def homework():
     print("home start")
+
+    sortingType = request.args.get("sortingType")
+    print(sortingType)
 
     # 페이지 값 (디폴트값 = 1)
     page = request.args.get("page", 1, type=int)
@@ -43,7 +45,12 @@ def homework():
     # 현재 블럭의 맨 끝 페이지 넘버 (첫 번째 블럭이라면, block_end = 5)
     block_end = block_start + (block_size - 1)
 
-    question_list = list(db.article.find({}).skip((page - 1) * limit).limit(limit))
+    question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
+    if sortingType == "hits":
+        question_list = list(db.article.find({}).sort("count",-1).skip((page - 1) * limit).limit(limit))
+    else:
+        question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
+
     id_list = []
 
     # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
@@ -59,8 +66,10 @@ def homework():
 
     if token_receive is None:
         print("비로그인 to index")
+
         return render_template('index.html', list=question_list, limit=limit, page=page, block_start=block_start,
                                block_end=block_end, last_page_num=last_page_num)
+
     else:
         print("로그인 to index" + token_receive)
         try:
@@ -74,13 +83,13 @@ def homework():
             return render_template('index.html', list=question_list, userId=user_id, userNickname=user_nickname,
                                    limit=limit, page=page, block_start=block_start, block_end=block_end,
                                    last_page_num=last_page_num)
+
         except jwt.ExpiredSignatureError:
             print('case1')
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
             print('case2')
             return redirect(url_for("login"))
-
 
 ## 글쓰기화면 보여주기
 @app.route('/write')
@@ -103,7 +112,6 @@ def write():
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
 
-
 ## 로그인 화면 보여주기
 @app.route('/login')
 def login():
@@ -115,21 +123,22 @@ def login():
 def search():
     words_receive = request.form['words_give']
 
-    find_list = list(db.article.find({'title': {'$regex': words_receive, '$options': 'i'}}))
-    # '$option' : 'i' =>  대소문자를 구분하지 않는 정규식 일치 수행
+    find_list = list(db.article.find({'title':{'$regex':words_receive, '$options' : 'i'}}))
+    #'$option' : 'i' =>  대소문자를 구분하지 않는 정규식 일치 수행
 
     id_list = []
 
     # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
     for item in find_list:
         id_list.append(str(item['_id']))
-    # find_list의 '_id' 값을 string으로 conver 후 id_list에 append
+
+    #find_list의 '_id' 값을 string으로 conver 후 id_list에 append
     for i in range(len(find_list)):
         del find_list[i]['_id']
         find_list[i]['_id'] = id_list[i]
-    # 정규식에 일치하는 값들만 빼옴
-    return jsonify({'searched_list': find_list})
+    #정규식에 일치하는 값들만 빼옴
 
+    return jsonify({'searched_list': find_list})
 
 ## mypage 화면
 @app.route('/api/mypage')
@@ -175,13 +184,11 @@ def updateMember():
             payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             db.user.update_many({'id': payload['id']}, {
                 '$set': {'password': pw_hash, 'zipcode': user_zipcode, 'address': user_address, 'detail': user_detail}})
-
             return jsonify({'result': 'success'})
         except jwt.ExpiredSignatureError:
             return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
         except jwt.exceptions.DecodeError:
             return redirect(url_for("login"))
-
 
 ## 글쓰기화면 보여주기
 @app.route('/api/read')
@@ -239,14 +246,15 @@ def read():
         reply_like_list = []
 
         # 댓글들의 좋아요 명단 가져오기
-        for item in reply_on_article:
-            like_list = item['good_bad']
-            print("list : " + str(like_list))
-            if user_id in like_list:
-                user_checker = True
-            else:
-                user_checker = False
-            reply_like_list.append(user_checker)
+        if reply_on_article != '':
+            for item in reply_on_article:
+                like_list = item['good_bad']
+                print("list : " + str(like_list))
+                if user_id in like_list:
+                    user_checker = True
+                else:
+                    user_checker = False
+                reply_like_list.append(user_checker)
 
         for i in range(len(reply_on_article)):
             reply_on_article[i]['like_checker'] = reply_like_list[i]
@@ -273,12 +281,10 @@ def read():
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login"))
 
-
 ## register 화면 보여주기
 @app.route('/registerPage')
 def registerPage():
     return render_template('register.html')
-
 
 ## 글 삭제하기
 @app.route('/api/delete', methods=['POST'])
@@ -355,13 +361,15 @@ def write_post():
             'user_id': id_receive,
             'title': title_receive,
             'contents': content_receive,
-            'imageUrl': f'{filename}.{extension[1]}.jpg'
+            'imageUrl': f'{filename}.{extension[1]}.jpg',
+            'count': 0
         }
     else:
         doc = {
             'user_id': id_receive,
             'title': title_receive,
-            'contents': content_receive
+            'contents': content_receive,
+            'count': 0
         }
 
     db.article.insert_one(doc)
@@ -391,7 +399,6 @@ def register():
     }
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
-
 
 @app.route('/api/like', methods=['POST'])
 def like():
@@ -432,7 +439,6 @@ def like():
     db.reply.update_one({'_id': ObjectId(id_receive)}, {'$set': {'good': str(good)}})
 
     return jsonify({'result': 'success', 'msg': '!'})
-
 
 @app.route('/api/setReply', methods=['POST'])
 def add_reply():
@@ -531,16 +537,16 @@ def modify_reply():
 ## 수정
 @app.route('/api/update', methods=['POST'])
 def update_posting():
-    id_receive = str(request.form['id_give'])
+    
+    id_receive = str(request.form['id_give']) 
     print('id_receive : ' + id_receive)
-    id_convert = ObjectId(id_receive);
+    id_convert = ObjectId(id_receive);    
     title_receive = request.form['title_give']
     content_receive = request.form['content_give']
+    
+    db.article.update_one({'_id':id_convert},{'$set':{'title': title_receive,'contents': content_receive}})
 
-    db.article.update_one({'_id': id_convert}, {'$set': {'title': title_receive, 'contents': content_receive}})
-
-    return jsonify({'result': 'success'})
-
+    return jsonify({'result': 'success'})      
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=5000, debug=True)
+    app.run('0.0.0.0', port=8000, debug=True)

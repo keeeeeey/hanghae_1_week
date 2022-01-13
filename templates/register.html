@@ -15,26 +15,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-    <style>
+    <style>        
 
-      .header{
+      .header{ 
          position: fixed;
-         display: flex;
-         justify-content: flex-start;
+         display: flex;     
+         justify-content: space-between;    
          align-items: center;
          padding: 0px;
          width: 100%;
-         height: 100px;
-         text-align: center;
-         font-size: 6px;
-         color: white;
+         height: 100px;   
+         text-align: center; 
+         font-size: 6px;    
+         color: white; 
          background-color: #00d1b2;
-      }
+         z-index :99999
+      }  
 
        /* body 스타일 */
-      .body{
+      .body{  
           display: flex;
-          justify-content: center;
+          justify-content: center;   
+          height: 900px;          
       }
       /* 내용부분body */
       .wrap{
@@ -42,26 +44,37 @@
          justify-content: center;
          padding:20px;
          width: 800px; /* 크기지정 */
-         height: 450px;
-         margin-top: 70px;
+         height: 450px;          
+         margin-top: 70px;             
       }
+      .container{
+          margin-bottom:50px;
+      }   
 
       .title_name{
-        font-size:35px;
+        font-size:27px;
         padding-left:50px;
         color:white;
       }
-      .hero-body{
+      .hero-body{ 
         padding: 0px;
       }
 
-        .is-safe {
-            color: #81c147;
-        }
-
-        .is-danger {
-            color: #ff0000;
-        }
+      .is-safe {
+          color: #81c147;
+      } 
+      .is-danger {
+          color: #ff0000;
+      }
+     button{   
+     transition: all 0.3s ease 0s;
+    }
+     button:hover{
+     background-color: #0f8a77;
+     color: white;
+     border:none;
+     transform: translateY(-5px);
+    } 
     </style>
 
     <script>
@@ -275,7 +288,8 @@
 <body>
 
     <div class = "header">
-      <p class="title_name">지식IN overflow</p>
+      <p class="title_name">지식IN overflow <span style="font-size:50px">Sign up</span></p>    
+      <img src="./static/image/file_w.png" width="250px" alt="My Image" style="margin:0px 5px 8px 0px">
     </div>
 
     <div class = "body">
@@ -401,10 +415,12 @@
                             </div>
                         </div>
                     </div>
-                    <button class="button is-primary" onclick="register()" style="margin-left: 50px;">회원가입</button>
+                    <button class="button is-primary" onclick="window.location.href='/login'" style="margin-left: 50px; width: 100px;">뒤로 가기</button>
+                    <button class="button is-primary" onclick="register()" style="margin-left: 50px; width: 100px;">회원가입</button>
                 </div>
             </div>
         </div>
     </div>
 </body>
 </html>
+>>>>>>> 931f2d4529c3d4e3be766ccd669a87965f65d09b
