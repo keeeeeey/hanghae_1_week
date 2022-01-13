@@ -49,7 +49,7 @@ def homework():
         question_list = list(db.article.find({}).sort("count",-1).skip((page - 1) * limit).limit(limit))
     else:
         question_list = list(db.article.find({}).sort("_id", -1).skip((page - 1) * limit).limit(limit))
-
+    print('question list : ' + str(question_list))
     id_list = []
 
     # id값을 가져올 수 있도록 articles의 ObjectId로 되어있는 _id를 str형식으로 변경한다.
@@ -261,8 +261,9 @@ def read():
 
         # 정렬
         reply_on_article = sorted(reply_on_article, key=lambda item: (-int(item['good'])))
-
+        print('target article : ' + str(target_article['user_id']) + ', user_id : ' + user_id)
         print('go return to read : ' + str(reply_on_article))
+        print('user_checker : ' + str(user_checker))
         return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
                                user_checker=user_checker, limit=limit, page=page, block_start=block_start,
                                block_end=block_end, last_page_num=last_page_num, user_id=user_id)
