@@ -300,7 +300,7 @@ def sign_in():
             'id': username_receive,
             'exp': datetime.utcnow() + timedelta(seconds=60 * 60 * 24)  # 로그인 24시간 유지
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
         return jsonify({'result': 'success', 'token': token})
     # 찾지 못하면
@@ -529,16 +529,16 @@ def modify_reply():
 ## 수정
 @app.route('/api/update', methods=['POST'])
 def update_posting():
-    
-    id_receive = str(request.form['id_give']) 
+
+    id_receive = str(request.form['id_give'])
     print('id_receive : ' + id_receive)
-    id_convert = ObjectId(id_receive);    
+    id_convert = ObjectId(id_receive);
     title_receive = request.form['title_give']
     content_receive = request.form['content_give']
-    
+
     db.article.update_one({'_id':id_convert},{'$set':{'title': title_receive,'contents': content_receive}})
 
-    return jsonify({'result': 'success'})      
+    return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', port=8000, debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
