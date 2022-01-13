@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>지식 in overflow Write_page</title>
 
     <!--Google Font Import-->
@@ -32,7 +33,6 @@
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
 
-
     <!-- Fontawesome Icon -->
     <script src="https://kit.fontawesome.com/c5929fafa9.js" crossorigin="anonymous"></script>
 
@@ -41,32 +41,33 @@
             font-family: 'Gowun Dodum', sans-serif;
         }
 
-        .header{
-        position: fixed;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0px;
-        width: 100%;
-        height: 70px;
-        text-align: center;
-        font-size: 6px;
-        color: white;
-        background-color: #00d1b2;
-        z-index :99999
+        .header {
+            position: fixed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px;
+            width: 100%;
+            height: 100px;
+            text-align: center;
+            font-size: 6px;
+            color: white;
+            background-color: #00d1b2;
+            z-index: 99999
         }
 
-        .title_name{
-          font-size:30px;
-          padding-left:30px;
-          color:white;
+        .title_name {
+            font-size: 30px;
+            padding-left: 30px;
+            color: white;
         }
+
         .div1 {
-            display:flex;
+            display: flex;
             flex-direction: row;
             text-align: center;
             align-items: center;
-            margin:20px 10px 0px 10px;
+            margin: 20px 10px 0px 10px;
         }
 
         a:visited {
@@ -155,19 +156,60 @@
 
         #button {
             width: 120px;
-            height:40px;
-            border:none;
-            border-radius:10px;
-            background-color:#00d1b2;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            background-color: #00d1b2;
             transition: all 0.3s ease 0s;
-            font-weight:bold;
+            font-weight: bold;
             color: white;
             margin-left: 5px;
         }
 
         #button:hover {
-            cursor:pointer;
+            cursor: pointer;
             transform: translateY(-5px);
+        }
+
+        .arrow-up {
+            margin: 10px;
+            position: relative;
+        }
+
+        .arrow-up::after {
+            position: absolute;
+            left: 0;
+            top: 0;
+            content: '';
+            width: 20px; /* 사이즈 */
+            height: 20px; /* 사이즈 */
+            border-top: 3px solid #000; /* 선 두께 */
+            border-right: 3px solid #000; /* 선 두께 */
+            transform: rotate(315deg); /* 각도 */
+        }
+
+        .arrow-down {
+            margin: 10px;
+            position: relative;
+        }
+
+        .arrow-down::after {
+            position: absolute;
+            left: 0;
+            top: 0;
+            content: '';
+            width: 20px; /* 사이즈 */
+            height: 20px; /* 사이즈 */
+            border-top: 3px solid #000; /* 선 두께 */
+            border-right: 3px solid #000; /* 선 두께 */
+            transform: rotate(135deg); /* 각도 */
+        }
+
+        .like_value {
+
+            font-size: 20px;
+            margin: auto;
+
         }
 
         .reply {
@@ -182,23 +224,24 @@
 
         }
 
-        .btns{
+        .btns {
             transition: all 0.3s ease 0s;
-            cursor:pointer;
-            font-size:15px;
-            margin-left:10px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-left: 10px;
             text-align: center;
             width: 80px;
             height: 30px;
             color: #4a4a4a;
         }
-        .btns:hover{
+
+        .btns:hover {
             color: white;
-            border:none;
+            border: none;
             width: 85px;
-            font-size:16px;
+            font-size: 16px;
             transform: translateY(-2px);
-            font-weight:bold;
+            font-weight: bold;
         }
 
         button {
@@ -224,6 +267,12 @@
             right: 1em;
             bottom: 0.5em;
             font-size: 1rem;
+        }
+
+        .img_show {
+            display: block;
+            width: 50%;
+            margin-left: 0.5em;
         }
 
     </style>
@@ -266,6 +315,7 @@
         }
 
         function goLike(reply_id, checker) {
+            console.log('goLike: reply_id : ' + reply_id)
 
             $.ajax({
                 type: "POST",
@@ -277,7 +327,15 @@
                 success: function (response) {
                     if (response["result"] == "success") {
                         window.location.reload();
+                        console.log('after response checker : ' + checker)
 
+                        if (checker) {
+                            change_color("gray_green", "arrow_down")
+                            change_color("black", "arrow_up")
+                        } else {
+                            change_color("gray_green", "arrow_up")
+                            change_color("black", "arrow_down")
+                        }
                     }
                 }
             })
@@ -345,10 +403,10 @@
 
         }
 
-        function toLogout(){
+        function toLogout() {
 
             $.removeCookie('mytoken');
-            window.location.href='/'
+            window.location.href = '/'
 
         }
 
@@ -417,25 +475,27 @@
             $('#modify_' + id).show()
             $('#delete_' + id).show()
         }
+
     </script>
 </head>
 <body>
 <div class="header">
     <p style="color:#00d1b2;">지식IN overflow</p>
-    <p class="title_name" style="margin-top:10px"> <img src="/static/image/file_w.png" width="50px" align="center" alt="My Image" style="margin:0px 5px 8px 0px">
+    <p class="title_name" style="margin-top:10px"><img src="/static/image/file_w.png" width="50px" align="center"
+                                                       alt="My Image" style="margin:0px 5px 8px 0px">
         지식IN overflow
     </p>
-        {% if userId %}
-            <div class = "div1">
-                <!--<p class="user_nickname"><span id="user_nickname" style="font-weight:bold;">{{userNickname}}</span> 님 환영합니다</p>-->
-                <p class="btns mypage_btn" onclick="toMypage()">마이페이지</p>
-                <p class="btns logout_btn" onclick="toLogout()">로그아웃</p>
-           </div>
-        {% else %}
-            <div class = "div1">
-                <p class="btns login_btn" onclick="toLogin()">로그인</p>
-            </div>
-        {% endif %}
+    {% if userId %}
+        <div class="div1">
+            <!--<p class="user_nickname"><span id="user_nickname" style="font-weight:bold;">{{userNickname}}</span> 님 환영합니다</p>-->
+            <p class="btns mypage_btn" onclick="toMypage()">마이페이지</p>
+            <p class="btns logout_btn" onclick="toLogout()">로그아웃</p>
+        </div>
+    {% else %}
+        <div class="div1">
+            <p class="btns login_btn" onclick="toLogin()">로그인</p>
+        </div>
+    {% endif %}
 </div>
 
 <div class="body">
@@ -443,14 +503,14 @@
 
         <div class="article">
             <span id="span_tag">Title</span><input class="ipbox_question" id="title" value="{{ target_article.title }}"
-                                                readonly>
+                                                   readonly>
             <input type="hidden" id="article_id" value="{{ target_article._id }}">
         </div>
         <div class="main_body">
             <textarea class="textarea_contents" id="contents" readonly>{{ target_article.contents }}</textarea>
         </div>
 
-        <img src="./../static/images/{{ target_article.imageUrl }}" alt="description image">
+        <img class="img_show" src="./../static/images/{{ target_article.imageUrl }}" alt="description image">
 
         <div class="buttons">
             {% if user_checker %}
@@ -483,12 +543,17 @@
                                 <div id="modify_reply{{ item._id }}">
                                     <textarea cols="80" rows="20" id="modify_value_reply{{ item._id }}"
                                               type="text">{{ item.reply_data }}</textarea>
-                                    <input type="button" value="수정하기" onclick="goModifyReply('{{ item._id }}')">
-                                    <input type="button" value="취소" onclick="cancelModify('{{ item._id }}')">
+
+                                        <input type="button" value="수정하기"
+                                               onclick="goModifyReply('{{ item._id }}')">
+                                        <input type="button" value="취소"
+                                               onclick="cancelModify('{{ item._id }}')">
+
                                 </div>
                                 <td>
                                     <script>init_hide("modify_reply" + '{{ item._id }}')</script>
                                 </td>
+
                             </div>
                         </div>
                         <div class="col">
@@ -515,6 +580,7 @@
                             </div>
                         </div>
                     </div>
+
                 {% endfor %}
             {% endif %}
 

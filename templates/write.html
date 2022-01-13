@@ -98,7 +98,7 @@
             margin:20px 10px 0px 10px;
         }
 
-        #user_nickname {
+        #user_id {
             font-size: 1rem;
             font-weight: bold;
         }
@@ -210,6 +210,11 @@
 
             let id = $('#user_id').text();
             let title = $('#title').val();
+            let title_check = title.trim();
+            if(title_check == null || title_check == "") {
+                alert('title을 입력하세요')
+                return;
+            }
             let content = $('#contents').val();
 
             if (image_checker) {
@@ -287,34 +292,6 @@
             }
         }
 
-        $('#btnUpload').on('click', function (event) {
-            event.preventDefault();
-
-            var form = $('#uploadForm')[0]
-            var data = new FormData(form);
-
-            $('#btnUpload').prop('disabled', true);
-
-            $.ajax({
-                type: "POST",
-                enctype: 'multipart/form-data',
-                url: "/upload",
-                data: data,
-                processData: false,
-                contentType: false,
-                cache: false,
-                timeout: 600000,
-                success: function (data) {
-                    $('#btnUpload').prop('disabled', false);
-                    alert('success')
-                },
-                error: function (e) {
-                    $('#btnUpload').prop('disabled', false);
-                    alert('fail');
-                }
-            });
-        })
-
         function loadFile(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -325,6 +302,8 @@
                     $('#preview').toggleClass('is-hidden')
                 };
                 reader.readAsDataURL(input.files[0]);
+
+                image_checker = true
             }
         }
 
