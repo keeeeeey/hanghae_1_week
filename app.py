@@ -246,15 +246,14 @@ def read():
         reply_like_list = []
 
         # 댓글들의 좋아요 명단 가져오기
-        if reply_on_article != '':
-            for item in reply_on_article:
-                like_list = item['good_bad']
-                print("list : " + str(like_list))
-                if user_id in like_list:
-                    user_checker = True
-                else:
-                    user_checker = False
-                reply_like_list.append(user_checker)
+        for item in reply_on_article:
+            like_list = item['good_bad']
+            print("list : " + str(like_list))
+            if user_id in like_list:
+                user_checker = True
+            else:
+                user_checker = False
+            reply_like_list.append(user_checker)
 
         for i in range(len(reply_on_article)):
             reply_on_article[i]['like_checker'] = reply_like_list[i]
@@ -275,7 +274,7 @@ def read():
         print('go return to read : ' + str(reply_on_article))
         return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
                                user_checker=user_checker, limit=limit, page=page, block_start=block_start,
-                               block_end=block_end, last_page_num=last_page_num, user_id=user_id)
+                               block_end=block_end, last_page_num=last_page_num, user_id=user_id, userId=user_id)
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
