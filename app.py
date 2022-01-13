@@ -266,7 +266,7 @@ def read():
         print('user_checker : ' + str(user_checker))
         return render_template('read.html', target_article=target_article, reply_on_article=reply_on_article,
                                user_checker=user_checker, limit=limit, page=page, block_start=block_start,
-                               block_end=block_end, last_page_num=last_page_num, user_id=user_id)
+                               block_end=block_end, last_page_num=last_page_num, user_id=user_id, userId=user_id)
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
@@ -529,16 +529,16 @@ def modify_reply():
 ## 수정
 @app.route('/api/update', methods=['POST'])
 def update_posting():
-    
-    id_receive = str(request.form['id_give']) 
+
+    id_receive = str(request.form['id_give'])
     print('id_receive : ' + id_receive)
-    id_convert = ObjectId(id_receive);    
+    id_convert = ObjectId(id_receive);
     title_receive = request.form['title_give']
     content_receive = request.form['content_give']
-    
+
     db.article.update_one({'_id':id_convert},{'$set':{'title': title_receive,'contents': content_receive}})
 
-    return jsonify({'result': 'success'})      
+    return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=8000, debug=True)
