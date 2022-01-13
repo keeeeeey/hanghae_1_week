@@ -3,6 +3,8 @@
 - 구현 유튜브 영상 : https://youtu.be/mU6tup7wXwo
 - github repo 주소 : https://github.com/keeeeeey/hanghae_1_week
 
+[![구현영상](./static/image/thumbnail_1week.png)](https://www.youtube.com/watch?v=xwqkv2Y31jE)
+
 ## 설명
 Stack over flow와 같은, 개발자들이 개발 도중 겪게되는 어려움이나 질문들을 올려 답변을 얻고 공유하는 사이트입니다.
 영어로만 이루어진 Stack over flow의 답변이 명쾌하게 와닿지 않고 답답할 때 한글로 된 stack over flow 사이트가 있다면 좀 더 문제해결에 대한 장벽이 낮아지지 않을까 하는 생각에 개발하기로 하였습니다.
